@@ -25,9 +25,9 @@ const createuser = async(req, res) => {
 
 
         // title validation
-        if (!title) return res.status(400).send({ status: false, msg: "title must be present" });
+        if (!title.trim()) return res.status(400).send({ status: false, msg: "title must be present" });
         if (typeof title !== "string") return res.status(400).send({ status: false, msg: "title should be string" });
-        if (!(["Mr", "Mrs", "Miss"].includes(data.title))) return res.status(400).send({ status: false, msg: "plz write valid title" })
+        if (!(["Mr", "Mrs", "Miss"].includes(data.title.trim()))) return res.status(400).send({ status: false, msg: "plz write valid title" })
 
         // email validation
         if (!email) {
@@ -50,9 +50,10 @@ const createuser = async(req, res) => {
         if (typeof password !== "string" || password.trim().length === 0) return res.status(400).send({ status: false, msg: "enter valid password" });
 
         let pass = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#\$%\^&\*])(?=.*[A-Z]).{8,16}$/.test(password.trim())
-            //  /^(?=.*\d)(?=.*[a-z])(?=.*[!@#\$%\^&\*])(?=.*[A-Z]).{6,20}$/
+
         if (!pass) return res.status(400).send({ status: false, msg: "1.At least one digit, 2.At least one lowercase character,3.At least one uppercase character,4.At least one special character, 5. At least 8 characters in length, but no more than 16" })
         data.password = data.password.trim()
+            // Phone va
         let mob = /^[0-9]{10}$/
         if (!mob.test(phone)) {
             return res.status(400).send({ status: false, msg: " phone number should have 10 digits only" });

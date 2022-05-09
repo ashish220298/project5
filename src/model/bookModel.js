@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId
 
 
-const blogSchema = new mongoose.Schema({
+const bookSchema = new mongoose.Schema({
     title: {
         required: true,
         type: String,
@@ -22,7 +22,7 @@ const blogSchema = new mongoose.Schema({
     userId: {
         required: true,
         type: ObjectId,
-        ref: 'user'
+        ref: 'userers'
     },
     reviews: {
         type: Number,
@@ -49,18 +49,14 @@ const blogSchema = new mongoose.Schema({
         default: false
 
     },
-    releaseddAt: {
+    releasedAt: {
         type: Date,
-        default: null
+        default: Date.now(),
+        required: true
     },
 
-    isPublished: {
-        type: Boolean,
-        default: false
-
-    }
 
 
 }, { timestamps: true });
 
-//module.exports = mongoose.model('Blog', blogSchema)
+module.exports = mongoose.model('Books', bookSchema)
