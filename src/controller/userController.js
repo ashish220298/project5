@@ -13,11 +13,11 @@ const createuser = async(req, res) => {
 
         if (data === undefined || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
 
-        // Fname validation
+        // name validation
         console.log(typeof name)
         if (name === undefined) return res.status(400).send({ status: false, msg: "first name must be present" });
-        // if(typeof fname !== "string"||fname.trim().length ===0) return res.status(400).send({ status:false, msg: "fname should be string" });
-        // data.fname = data.fname.trim()
+        if (typeof name !== "string" || name.trim().length === 0) return res.status(400).send({ status: false, msg: "fname should be string" });
+        data.name = data.name.trim()
         let nname = /^[a-zA-z ]{2,30}$/.test(name)
         if (!nname) return res.status(400).send({ status: false, msg: "enter valid  name" })
 
@@ -67,7 +67,7 @@ const createuser = async(req, res) => {
         if (call) return res.status(400).send({ status: false, msg: "this phone is already present" })
 
         // address validation 
-        if (!address.street.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in address street must be present present" })
+        if (!address.street.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in address street must be present" })
         if (!address.city.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in address city must be present" })
         if (!address.pincode.trim()) return res.status(400).send({ status: false, msg: "in address pincode must be present present" })
         let pin = /^[0-9]{6}$/.test(address.pincode)

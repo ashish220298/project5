@@ -12,7 +12,8 @@ const reviewModel = require("../model/reviewModel")
 const reviewsData = async function(req, res) {
     try {
 
-        let bookId = req.query.bookId
+        let bookId = req.params.bookId
+            // console.log(bookId)
         let data1 = req.body
 
         const { reviewedBy, rating, review } = data1
@@ -23,13 +24,14 @@ const reviewsData = async function(req, res) {
 
         if (bookId) {
             if (!mongoose.isValidObjectId(bookId)) {
-                return res.status(400).send({ status: false, msg: "authorId is not a type of objectId" })
+                return res.status(400).send({ status: false, msg: "bookId is not a type of objectId" })
             }
         }
-        let check = await bookModel.findOne({ bookId: bookId })
+        let check = await bookModel.findOne({ _id: bookId, isDeleted: false }).select()
         if (!check) {
-            return res.status(400).send({ status: false, msg: "bookId is not present" })
+            return res.status(400).send({ status: false, msg: "bookId is not present or Already deleted" })
         }
+        // console.log(check)
         data1.bookId = check._id
 
 
@@ -41,13 +43,14 @@ const reviewsData = async function(req, res) {
 
         let rev = await reviewModel.create(data1)
 
-        let dataa = await reviewModel.find().select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
-
-        let dataaa = await reviewModel.find().count()
+        let dataa = await reviewModel.find({ bookId: bookId }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
+            // console.log(dataa)
+        let dataaa = await reviewModel.find({ bookId: bookId }).count()
         let reviews = dataaa
-        const updatebooks = await bookModel.findOneAndUpdate(bookId, {
+        const updatebooks = await bookModel.findOneAndUpdate({ _id: bookId }, {
             $set: { reviews: reviews }
         }, { new: true }).select()
+        console.log(updatebooks)
         let doc = {
             data: updatebooks,
             reviewsData: dataa,

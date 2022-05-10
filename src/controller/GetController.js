@@ -21,7 +21,7 @@ const getBooks = async function(req, res) {
                 return res.status(400).send({ status: false, msg: "authorId is not a type of objectId" })
             }
         }
-        let check = await userModel.findOne({ userId: userId }) //.select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 })
+        let check = await userModel.findOne({ _id: userId }) //.select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 })
         if (!check) {
             return res.status(400).send({ status: false, msg: "userId is not present" })
         }

@@ -9,29 +9,30 @@ const bookModel = require("../model/bookModel")
 const createBooks = async function(req, res) {
     try {
         const data = req.body
-            //  data validation
+            //  data validation  
 
         if (!data || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
 
         let { title, userId, excerpt, ISBN, category, subcategory, reviews, isDeleted } = data
-        const check = await bookModel.findOne({ title: title, ISBN: ISBN })
+        // Book is same Book or not
+        const check = await bookModel.findOne({ $or: [{ title: title }, { ISBN: ISBN }] })
         console.log(check)
         if (check) return res.status(400).send({ status: false, msg: "this book already exist" })
             // authorId validation
 
         if (!userId) {
-            return res.status(400).send({ status: false, msg: "authorId must be present" })
+            return res.status(400).send({ status: false, msg: "userId must be present" })
         }
         let idCheck = mongoose.isValidObjectId(userId)
         console.log(idCheck)
-        if (!idCheck) return res.status(400).send({ status: false, msg: "authorId is not a type of objectId" })
+        if (!idCheck) return res.status(400).send({ status: false, msg: "userId is not a type of objectId" })
 
         const id = await userModel.findById(userId)
         if (!id) {
-            return res.status(404).send({ status: false, msg: "this Author is not present." })
+            return res.status(404).send({ status: false, msg: "this user is not present." })
         }
         //  accessing the payload authorId from request
-        let token = req["authorId"]
+        let token = req["userId"]
 
         //  authorization
         if (token != userId) {
@@ -48,7 +49,7 @@ const createBooks = async function(req, res) {
 
 
         // ISBN validation
-        if (!ISBN.trim() || ISBN.trim() === undefined) {
+        if (!ISBN || ISBN === undefined) {
             return res.status(400).send({ status: false, msg: "ISBN is not given" })
         }
 
@@ -56,28 +57,28 @@ const createBooks = async function(req, res) {
         if (!ISBNN) {
             return res.status(400).send({ status: false, msg: "ISBN is ony number" })
         }
-        // let checking = await bookModel.find()
-        // reviews Validation
-        if (!reviews || Object.values(reviews).length === 0) {
+        data.ISBN = data.ISBN.trim()
+            //reviews Validation
+        if (!reviews || !Object.values(reviews).length) {
             return res.status(400).send({ status: false, msg: "reviews is not given" })
         }
 
         let reviewss = /^[0-9]$/.test(reviews)
         if (!reviewss) {
-            return res.status(400).send({ status: false, msg: "Reviews is only number" })
+            return res.status(400).send({ status: false, msg: "Reviews is only  number when u created" })
         }
         // body validation
-        if (!excerpt.trim() || excerpt.trim() === undefined) {
+        if (!excerpt || excerpt === undefined) {
             return res.status(400).send({ status: false, msg: "excerpt is not Given" })
         }
-        if (typeof excerpt !== "string" || excerpt.trim().length === 0) return res.status(400)
-            .send({ status: false, msg: "please enter valid excerpt" });
+        if (typeof excerpt !== "string" || excerpt.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid excerpt" });
         data.excerpt = data.excerpt.trim()
 
         // category validation
         if (!category || category === undefined) {
             return res.status(400).send({ status: false, msg: "category must be present" })
         }
+
         if (typeof category !== "string" || category.trim().length === 0) return res.send({ status: false, msg: "please enter valid category" })
         data.category = data.category.trim()
 

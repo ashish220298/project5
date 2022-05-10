@@ -20,21 +20,21 @@ const updatebooks = async function(req, res) {
 
 
 
-        // blogid Validation
+        // bookid Validation
         let idCheck = mongoose.isValidObjectId(bookId)
 
-        if (!idCheck) return res.status(400).send({ status: false, msg: "blogId is not a type of objectId" })
+        if (!idCheck) return res.status(400).send({ status: false, msg: "bookId is not a type of objectId" })
 
         let status = await bookModel.findById(bookId)
-        if (!status) return res.status(404).send({ msg: "this blog is not present" })
+        if (!status) return res.status(404).send({ msg: "this book is not present" })
 
         // authorization
-        let token = req["authorId"]
+        let token = req["userId"]
 
         if (status.userId != token) {
             return res.status(403).send({ status: false, msg: "You are not authorized to access this data" })
         }
-        if (status.isDeleted === true) return res.status(404).send({ status: false, msg: "this blog is already deleted" })
+        if (status.isDeleted === true) return res.status(404).send({ status: false, msg: "this book is already deleted" })
 
 
 
