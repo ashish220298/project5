@@ -23,12 +23,12 @@ const getBooks = async function(req, res) {
         }
         let check = await userModel.findOne({ userId: userId }) //.select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 })
         if (!check) {
-            return res.status(400).send({ status: false, msg: "authorId is not present" })
+            return res.status(400).send({ status: false, msg: "userId is not present" })
         }
 
-        // let filter = { isDeleted: false, ...data1 }
+        let filter = { isDeleted: false, ...data1 }
 
-        // let data = await bookModel.find(filter).select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 })
+        let data = await bookModel.find(filter).select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 })
         if (data1.length === 0) {
             return res.status(404).send({ status: false, msg: "Blogs not found" })
         }

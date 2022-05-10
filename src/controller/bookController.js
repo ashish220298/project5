@@ -34,7 +34,7 @@ const createBooks = async function(req, res) {
         let token = req["authorId"]
 
         //  authorization
-        if (token != authorId) {
+        if (token != userId) {
             return res.status(403).send({ status: false, msg: "You are not authorized to access this data" })
         }
         console.log(title)
@@ -56,15 +56,15 @@ const createBooks = async function(req, res) {
         if (!ISBNN) {
             return res.status(400).send({ status: false, msg: "ISBN is ony number" })
         }
-        let checking = await bookModel.find()
-            // reviews Validation
-        if (!reviews || reviews === undefined) {
+        // let checking = await bookModel.find()
+        // reviews Validation
+        if (!reviews || Object.values(reviews).length === 0) {
             return res.status(400).send({ status: false, msg: "reviews is not given" })
         }
 
-        let reviewss = /^[0-9\.]{0,5}$/.test(reviews)
+        let reviewss = /^[0-9]$/.test(reviews)
         if (!reviewss) {
-            return res.status(400).send({ status: false, msg: "Reviews is only 0 to 5" })
+            return res.status(400).send({ status: false, msg: "Reviews is only number" })
         }
         // body validation
         if (!excerpt.trim() || excerpt.trim() === undefined) {
