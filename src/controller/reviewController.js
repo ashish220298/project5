@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const userModel = require("../model/userModel")
 const bookModel = require("../model/bookModel")
-const reviewModel = require("../model/reviewModel")
 
+const reviewModel = require("../model/reviewModel")
 
 
 
@@ -43,19 +43,19 @@ const reviewsData = async function(req, res) {
 
         let rev = await reviewModel.create(data1)
 
-        let dataa = await reviewModel.find({ bookId: bookId }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
+        let dataa = await reviewModel.find({ bookId: bookId, isDeleted: false }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
             // console.log(dataa)
-        let dataaa = await reviewModel.find({ bookId: bookId }).count()
+        let dataaa = await reviewModel.find({ bookId: bookId, isDeleted: false }).count()
         let reviews = dataaa
         const updatebooks = await bookModel.findOneAndUpdate({ _id: bookId }, {
             $set: { reviews: reviews }
         }, { new: true }).select()
         console.log(updatebooks)
+
+
         let doc = {
             data: updatebooks,
             reviewsData: dataa,
-
-
         }
 
 

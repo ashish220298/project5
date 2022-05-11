@@ -4,7 +4,6 @@ const router = express.Router();
 
 const loginController = require("../controller/loginController")
 const middleWare = require("../middleWare/auth")
-
 const put = require("../controller/putController")
 const dController = require("../controller/DeleteControlle")
 const user = require("../controller/userController")
@@ -22,13 +21,17 @@ router.post("/books", middleWare.validateToken, post.createBooks)
 
 router.get("/books", get.getBooks)
 
+router.get("/books/:bookId", get.getBooksById)
+
 router.put("/blooks/:bookId", middleWare.validateToken, put.updatebooks)
+
+router.put("/books/:bookId/review/:reviewId", put.updatereview)
 
 router.post("/books/:bookId/review", postt.reviewsData)
 
-router.delete("/books/:bookId", dController.deletById)
+router.delete("/books/:bookId", middleWare.validateToken, dController.deletById)
 
-//router.delete("/blogs", middleWare.validateToken, dController.deletByProperty)
+router.delete("/books/:bookId/review/:reviewId", dController.reviewdelet)
 
 
 

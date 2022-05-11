@@ -1,9 +1,7 @@
-//const mongoose  = require('mongoose');
-
 const mongoose = require('mongoose');
 const userModel = require("../model/userModel")
 const bookModel = require("../model/bookModel")
-
+const reviewModel = require("../model/reviewModel")
 
 
 
@@ -58,6 +56,69 @@ const updatebooks = async function(req, res) {
 
 }
 
+const updatereview = async function(req, res) {
 
+    try {
+        let bookId = req.params.bookId;
+        let reviewId = req.params.reviewId;
+
+
+
+        let data = req.body
+
+        let { review, rating, reviewedBy } = data // destructuring
+
+        if (!data || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
+
+        if (!(review || rating || reviewedBy)) {
+            return res.status(404).send({ status: false, msg: "Plz enter valid keys for updation " })
+        }
+
+        // bookid Validation and reviwId validation
+        let idCheck = mongoose.isValidObjectId(bookId)
+
+        if (!idCheck) return res.status(400).send({ status: false, msg: "bookId is not a type of objectId" })
+
+        let idCheckk = mongoose.isValidObjectId(reviewId)
+
+        if (!idCheckk) return res.status(400).send({ status: false, msg: "reviewId is not a type of objectId" })
+
+        // book present or not
+        let status = await bookModel.findOne({ _id: bookId }, )
+        if (!status) return res.status(404).send({ msg: "this book is not present" })
+            // review present or not
+        let statuss = await reviewModel.findOne({ _id: reviewId }, )
+        if (!statuss) return res.status(404).send({ msg: "this reviewer is not present" })
+
+
+        if (status.isDeleted === true) return res.status(404).send({ status: false, msg: "this book is already deleted" })
+
+        if (statuss.isDeleted === true) return res.status(404).send({ status: false, msg: "this reviewr is already deleted" })
+
+
+
+
+
+        const updatereview = await reviewModel.findOneAndUpdate({ _id: reviewId, bookId: bookId }, {
+
+            $set: { review: review, rating: rating, reviewedBy: reviewedBy }
+
+        }, { new: true }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
+        let Doc = {
+            Book: status,
+            reviewerData: updatereview
+
+        }
+
+
+        return res.status(200).send({ status: true, msg: "updated review with book", data: Doc });
+    } catch (err) {
+        console.log(err.message)
+        return res.status(500).send({ status: "error", error: err.message })
+    }
+
+
+}
 
 module.exports.updatebooks = updatebooks
+module.exports.updatereview = updatereview
