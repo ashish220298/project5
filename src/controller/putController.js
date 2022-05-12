@@ -84,11 +84,11 @@ const updatereview = async function(req, res) {
         if (!idCheckk) return res.status(400).send({ status: false, msg: "reviewId is not a type of objectId" })
 
         // book present or not
-        let status = await bookModel.findOne({ _id: bookId }, )
-        if (!status) return res.status(404).send({ msg: "this book is not present" })
+        let status = await bookModel.findOne({ _id: bookId, isDeleted: false }, )
+        if (!status) return res.status(404).send({ msg: "this book is not present or Already Deleted" })
             // review present or not
-        let statuss = await reviewModel.findOne({ _id: reviewId }, )
-        if (!statuss) return res.status(404).send({ msg: "this reviewer is not present" })
+        let statuss = await reviewModel.findOne({ _id: reviewId, isDeleted: false }, )
+        if (!statuss) return res.status(404).send({ msg: "this reviewer is not present or Already Deleted" })
 
 
         if (status.isDeleted === true) return res.status(404).send({ status: false, msg: "this book is already deleted" })

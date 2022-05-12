@@ -62,7 +62,7 @@ const getBooksById = async function(req, res) {
             return res.status(404).send({ status: false, msg: "Book not found" })
         }
 
-        const data = await reviewModel.find({ bookId: bookId }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 }).sort({ "reviewedBy": 1 })
+        const data = await reviewModel.find({ bookId: bookId, isDeleted: false }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 }).sort({ "reviewedBy": 1 })
 
         const book = await bookModel.findById(bookId)
 
