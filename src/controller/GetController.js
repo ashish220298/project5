@@ -15,20 +15,22 @@ const getBooks = async function(req, res) {
 
         const { userId, category, subcategory } = data1
 
-        if (Object.keys(data1).length === 0) {
-            if (!(userId || category || subcategory)) return res.status(400).send({ status: false, msg: "not a valid filter" })
-        }
+        //  if (Object.keys(data1).length === 0) {
+        //   if (!(userId || category || subcategory)) return res.status(400).send({ status: false, msg: "not a valid filter" })
+        // }
 
         if (userId) {
             if (!mongoose.isValidObjectId(userId)) {
-                return res.status(400).send({ status: false, msg: "authorId is not a type of objectId" })
+                return res.status(400).send({ status: false, msg: "userId is not a type of objectId" })
             }
         }
 
 
-        let filter = { isDeleted: false, $or: [{ userId: userId }, { category: category }, { subcategory: subcategory }] }
+        //let filter = { isDeleted: false, $or: [{ userId: userId }, { category: category }, { subcategory: subcategory }] }
 
-        let data = await bookModel.find(filter) //.select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 })
+        let data = await bookModel.find({
+            $and: [{ isDeleted: false, ...data1 }],
+        }).select({ bookId: 1, title: 1, excerpt: 1, userId: 1, category: 1, subcategory: 1, reviews: 1, releasedAt: 1, }).sort({ title: 1 });
 
         if (!data) {
             return res.status(400).send({ status: false, msg: " not valied" })
@@ -60,7 +62,7 @@ const getBooksById = async function(req, res) {
             return res.status(404).send({ status: false, msg: "Book not found" })
         }
 
-        const data = await reviewModel.find({ bookId: bookId }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
+        const data = await reviewModel.find({ bookId: bookId }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 }).sort({ "reviewedBy": 1 })
 
         const book = await bookModel.findById(bookId)
 
