@@ -59,14 +59,14 @@ const createBooks = async function(req, res) {
         }
         data.ISBN = data.ISBN.trim()
             //reviews Validation
-        if (!reviews || !Object.values(reviews).length) {
-            return res.status(400).send({ status: false, msg: "reviews is not given" })
-        }
+            // if (!reviews || reviews === undefined) {
+            // return res.status(400).send({ status: false, msg: "reviews is not given" })
+            //  }
 
-        let reviewss = /^[0-9]$/.test(reviews)
-        if (!reviewss) {
-            return res.status(400).send({ status: false, msg: "Reviews is only  number when u created" })
-        }
+        // let reviewss = /^[0]$/.test(reviews)
+        // if (!reviewss) {
+        // return res.status(400).send({ status: false, msg: "Reviews is only 0 when u created" })
+        // }
         // body validation
         if (!excerpt || excerpt === undefined) {
             return res.status(400).send({ status: false, msg: "excerpt is not Given" })
