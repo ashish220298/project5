@@ -40,7 +40,7 @@ const updatebooks = async function(req, res) {
             return res.status(404).send({ status: false, msg: "Plz enter valid keys for updation " })
         }
 
-        const updatebooks = await bookModel.findOneAndUpdate(bookId, {
+        const updatebooks = await bookModel.findOneAndUpdate({ _id: bookId }, {
             // $addToSet: { tags: tags, subcategory: subcategory },
             $set: { title: title, excerpt: excerpt, ISBN: ISBN, releasedAt: Date.now() }
         }, { new: true });

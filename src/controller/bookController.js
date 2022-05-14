@@ -97,7 +97,7 @@ const createBooks = async function(req, res) {
 
         // subcategory validation
 
-        if (subcategory || typeof tags == "string") {
+        if (subcategory || typeof subcategory == "string") {
             if (!Array.isArray(subcategory)) return res.status(400)
                 .send({ status: false, msg: "subcategory should be array of strings" })
 
