@@ -54,9 +54,9 @@ const createBooks = async function(req, res) {
         }
         if (typeof releasedAt !== "string" || releasedAt.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid releasedAt and Should be in String" });
 
-        let releasedAtt = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/.test(releasedAt.trim())
+        let releasedAtt = /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(releasedAt.trim())
         if (!releasedAtt) {
-            return res.status(400).send({ status: false, msg: " releasedAt DD/MM/YYYY Format or Enter A valied Date " })
+            return res.status(400).send({ status: false, msg: " releasedAt YYYY-MM-DD Format or Enter A valied Date " })
         }
         data.releasedAt = data.releasedAt.trim()
 
@@ -66,7 +66,7 @@ const createBooks = async function(req, res) {
             return res.status(400).send({ status: false, msg: "ISBN is not given" })
         }
 
-        let ISBNN = /^[0-9-_]{0,20}$/.test(ISBN.trim())
+        let ISBNN = /^\d{3}-?\d{10}/.test(ISBN.trim())
         if (!ISBNN) {
             return res.status(400).send({ status: false, msg: "ISBN is ony number" })
         }
@@ -109,10 +109,14 @@ const createBooks = async function(req, res) {
 
 
         // subcategory validation
+        if (!subcategory) return res.status(400).send({ status: false, msg: "subcategory should be present" })
 
         if (subcategory || typeof subcategory == "string") {
-            if (!Array.isArray(subcategory)) return res.status(400)
-                .send({ status: false, msg: "subcategory should be array of strings" })
+            if (!Array.isArray(subcategory)) return res.status(400).send({ status: false, msg: "subcategory should be array of strings" })
+
+            if (subcategory.some(x => typeof x === "string" && x.trim().length === 0)) {
+                return res.status(400).send({ status: false, message: " subcategory should not be empty or with white spaces" })
+            }
 
 
         }

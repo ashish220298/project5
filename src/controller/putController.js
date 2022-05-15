@@ -14,7 +14,7 @@ const updatebooks = async function(req, res) {
 
         let data = req.body
 
-        let { title, excerpt, ISBN } = data // destructuring
+        let { title, excerpt, ISBN, releasedAt } = data // destructuring
 
 
 
@@ -35,14 +35,60 @@ const updatebooks = async function(req, res) {
         if (status.isDeleted === true) return res.status(404).send({ status: false, msg: "this book is already deleted" })
 
 
-
-        if (!(title || excerpt || ISBN)) {
+        if (!(title || excerpt || ISBN || releasedAt)) {
             return res.status(404).send({ status: false, msg: "Plz enter valid keys for updation " })
+        }
+
+
+        if (title) {
+
+            const titleCheck = await bookModel.findOne({ title: title.trim() }) //.collation({ locale: 'en', strength: 2 })
+            if (titleCheck) {
+                return res.status(400).send({ status: false, message: " this title already exist " })
+            }
+            if (!title || title === undefined) {
+                return res.status(400).send({ status: false, msg: "title is not given" })
+            }
+            if (typeof title !== "string" || title.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid title" });
+
+        }
+        if (excerpt) {
+
+            if (!excerpt || excerpt === undefined) {
+                return res.status(400).send({ status: false, msg: "excerpt is not Given" })
+            }
+            if (typeof excerpt !== "string" || excerpt.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid excerpt" });
+
+        }
+        if (ISBN) {
+
+            if (!/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN)) {
+                return res.status(400).send({ status: false, message: "  please enter valid ISBN " })
+            }
+            const ISBNCheck = await bookModel.findOne({ ISBN: ISBN })
+            if (ISBNCheck) {
+                return res.status(400).send({ status: false, message: " this ISBN already exist " })
+            }
+        }
+
+        if (releasedAt) {
+            if (!releasedAt || releasedAt === undefined) {
+                return res.status(400).send({ status: false, msg: "releasedAt is not given" })
+            }
+            if (typeof releasedAt !== "string" || releasedAt.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid releasedAt and Should be in String" });
+
+            let releasedAtt = /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(releasedAt.trim())
+            if (!releasedAtt) {
+                return res.status(400).send({ status: false, msg: " releasedAt YYYY/MM/DD Format or Enter A valied Date " })
+            }
+
+
+
         }
 
         const updatebooks = await bookModel.findOneAndUpdate({ _id: bookId }, {
             // $addToSet: { tags: tags, subcategory: subcategory },
-            $set: { title: title, excerpt: excerpt, ISBN: ISBN, releasedAt: Date.now() }
+            $set: { title: title, excerpt: excerpt, ISBN: ISBN }
         }, { new: true });
 
 
@@ -59,6 +105,10 @@ const updatebooks = async function(req, res) {
 const updatereview = async function(req, res) {
 
     try {
+        if (req.params.bookId == undefined)
+            return res.status(400).send({ status: false, message: "bookId is required." });
+        if (req.params.reviewId == undefined)
+            return res.status(400).send({ status: false, message: "reviewId is required." });
         let bookId = req.params.bookId;
         let reviewId = req.params.reviewId;
 
@@ -95,7 +145,31 @@ const updatereview = async function(req, res) {
 
         if (statuss.isDeleted === true) return res.status(404).send({ status: false, msg: "this reviewr is already deleted" })
 
+        if (reviewedBy) {
+            if (!reviewedBy || reviewedBy === undefined) {
+                return res.status(400).send({ status: false, msg: "reviewedBy is not given" })
+            }
+            if (typeof reviewedBy !== "string" || reviewedBy.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid reviwer Name" });
+            reviewedBy = reviewedBy.trim()
+        }
+        if (rating) {
 
+
+            let rat = /^[0-5\.]{1,5}$/
+            if (!rat.test(rating)) {
+                return res.status(400).send({ status: false, msg: " review number should  digits only and should be 1 to 5" });
+            }
+
+        }
+        if (review) {
+
+            if (!review || review.trim() === undefined) {
+                return res.status(400).send({ status: false, msg: "review is not given" })
+            }
+            if (typeof review !== "string" || review.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid review" });
+
+            data.review = data.review.trim()
+        }
 
 
 

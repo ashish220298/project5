@@ -46,7 +46,8 @@ const getBooks = async function(req, res) {
 
 const getBooksById = async function(req, res) {
     try {
-
+        if (req.params.bookId == undefined)
+            return res.status(400).send({ status: false, message: "bookId is required." });
         let bookId = req.params.bookId
 
         if (bookId) {

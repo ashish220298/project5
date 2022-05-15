@@ -11,12 +11,13 @@ const reviewModel = require("../model/reviewModel")
 
 const reviewsData = async function(req, res) {
     try {
-
+        if (req.params.bookId == undefined)
+            return res.status(400).send({ status: false, message: "bookId is required." });
         let bookId = req.params.bookId
-            // console.log(bookId)
+        console.log(bookId)
         let data1 = req.body
 
-        const { reviewedBy, rating, review } = data1
+        let { reviewedBy, rating, review } = data1
 
         if (!Object.keys(data1).length) {
             return res.status(400).send({ status: false, msg: "enter some data" })
@@ -31,16 +32,33 @@ const reviewsData = async function(req, res) {
         if (!check) {
             return res.status(400).send({ status: false, msg: "bookId is not present or Already deleted" })
         }
-        // console.log(check)
-        data1.bookId = check._id
-
-
-
         if (check.length === 0) {
             return res.status(404).send({ status: false, msg: "Book not found" })
         }
 
+        data1.bookId = check._id
+            // console.log(check)
 
+        if (reviewedBy) {
+            if (!(reviewedBy) || reviewedBy === undefined) {
+                return res.status(400).send({ status: false, msg: "reviewedBy is not given" })
+            }
+            if (typeof reviewedBy !== "string" || reviewedBy.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid reviwer Name" });
+            reviewedBy = reviewedBy.trim()
+
+        }
+        if (review) {
+            if (!review || !review.trim()) {
+                return res.status(400).send({ status: false, msg: "review is not given" })
+            }
+            if (typeof review !== "string" || review.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid review" });
+            data1.review = data1.review.trim()
+        }
+        let rat = /^[0-5\.]{1,5}$/
+        if (!rat.test(rating)) {
+            return res.status(400).send({ status: false, msg: " review number should  digits only and should be 1 to 5" });
+        }
+        // rating = rating
         let rev = await reviewModel.create(data1)
 
         let Id = rev._id
