@@ -54,9 +54,9 @@ const createBooks = async function(req, res) {
         }
         if (typeof releasedAt !== "string" || releasedAt.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid releasedAt and Should be in String" });
 
-        let releasedAtt = /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(releasedAt.trim())
+        let releasedAtt = /^\d{4}[\/\-](0?[1-9]|1[012])[\/\-](0?[1-9]|[12][0-9]|3[01])$/.test(releasedAt.trim())
         if (!releasedAtt) {
-            return res.status(400).send({ status: false, msg: " releasedAt YYYY-MM-DD Format or Enter A valied Date " })
+            return res.status(400).send({ status: false, msg: " releasedAt YYYY/MM/DD or YYYY-MM-DD Format or Enter A valied Date " })
         }
         data.releasedAt = data.releasedAt.trim()
 
@@ -117,7 +117,12 @@ const createBooks = async function(req, res) {
             if (subcategory.some(x => typeof x === "string" && x.trim().length === 0)) {
                 return res.status(400).send({ status: false, message: " subcategory should not be empty or with white spaces" })
             }
+            const subtrim = data.subcategory.map(element => {
+                return element.trim()
 
+            })
+
+            data.subcategory = subtrim
 
         }
         console.log(data)
