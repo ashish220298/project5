@@ -62,7 +62,7 @@ const updatebooks = async function(req, res) {
         }
         if (ISBN) {
 
-            if (!/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN)) {
+            if (!/^\d{3}-?\d{10}/.test(ISBN)) {
                 return res.status(400).send({ status: false, message: "  please enter valid ISBN " })
             }
             const ISBNCheck = await bookModel.findOne({ ISBN: ISBN })
@@ -77,7 +77,7 @@ const updatebooks = async function(req, res) {
             }
             if (typeof releasedAt !== "string" || releasedAt.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid releasedAt and Should be in String" });
 
-            let releasedAtt = /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(releasedAt.trim())
+            let releasedAtt = /^^\d{4}[\/\-](0?[1-9]|1[012])[\/\-](0?[1-9]|[12][0-9]|3[01])$/.test(releasedAt.trim())
             if (!releasedAtt) {
                 return res.status(400).send({ status: false, msg: " releasedAt YYYY/MM/DD Format or Enter A valied Date " })
             }
