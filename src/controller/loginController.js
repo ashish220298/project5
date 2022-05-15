@@ -29,7 +29,7 @@ const loginUser = async function(req, res) {
                 group: "13",
                 project: 3,
             },
-            "project-3-group-13"
+            "project-3-group-13", { expiresIn: '3600s' }
         );
 
         // Set This token In response in Header and Also In body
