@@ -13,7 +13,7 @@ const createBooks = async function(req, res) {
 
         if (!data || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
 
-        let { title, userId, excerpt, ISBN, category, subcategory, reviews, isDeleted } = data
+        let { title, userId, excerpt, ISBN, category, subcategory, reviews, releasedAt, isDeleted } = data
         // Book is same Book or not
         const check = await bookModel.findOne({ $or: [{ title: title }, { ISBN: ISBN }] })
         console.table(check)
@@ -48,7 +48,20 @@ const createBooks = async function(req, res) {
         title = title.trim()
 
 
+        // releasedAt validation
+        if (!releasedAt || releasedAt === undefined) {
+            return res.status(400).send({ status: false, msg: "releasedAt is not given" })
+        }
+        if (typeof releasedAt !== "string" || releasedAt.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid releasedAt and Should be in String" });
+
+        let releasedAtt = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/.test(releasedAt.trim())
+        if (!releasedAtt) {
+            return res.status(400).send({ status: false, msg: " releasedAt DD/MM/YYYY Format or Enter A valied Date " })
+        }
+        data.releasedAt = data.releasedAt.trim()
+
         // ISBN validation
+
         if (!ISBN || ISBN === undefined) {
             return res.status(400).send({ status: false, msg: "ISBN is not given" })
         }
