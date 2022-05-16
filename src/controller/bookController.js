@@ -114,7 +114,7 @@ const createBooks = async function(req, res) {
         if (subcategory || typeof subcategory == "string") {
             if (!Array.isArray(subcategory)) return res.status(400).send({ status: false, msg: "subcategory should be array of strings" })
 
-            if (subcategory.some(x => typeof x === "string" && x.trim().length === 0)) {
+            if (subcategory.some(sub => typeof sub === "string" && sub.trim().length === 0)) {
                 return res.status(400).send({ status: false, message: " subcategory should not be empty or with white spaces" })
             }
             const subtrim = data.subcategory.map(element => {
