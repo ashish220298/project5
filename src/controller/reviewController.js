@@ -30,27 +30,19 @@ const reviewsData = async function(req, res) {
         }
         let check = await bookModel.findOne({ _id: bookId, isDeleted: false }).select()
         if (!check) {
-            return res.status(400).send({ status: false, msg: "bookId is not present or Already deleted" })
+            return res.status(404).send({ status: false, msg: "bookId is not present or Already deleted" })
         }
-        if (check.length === 0) {
-            return res.status(404).send({ status: false, msg: "Book not found" })
-        }
+
 
         data1.bookId = check._id
             // console.log(check)
 
         if (reviewedBy) {
-            if (!(reviewedBy) || reviewedBy === undefined) {
-                return res.status(400).send({ status: false, msg: "reviewedBy is not given" })
-            }
             if (typeof reviewedBy !== "string" || reviewedBy.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid reviwer Name" });
             reviewedBy = reviewedBy.trim()
 
         }
         if (review) {
-            if (!review || !review.trim()) {
-                return res.status(400).send({ status: false, msg: "review is not given" })
-            }
             if (typeof review !== "string" || review.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid review" });
             data1.review = data1.review.trim()
         }

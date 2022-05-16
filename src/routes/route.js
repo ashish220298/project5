@@ -23,7 +23,7 @@ router.get("/books", get.getBooks)
 
 router.get("/books/:bookId", get.getBooksById)
 
-router.put("/blooks/:bookId", middleWare.validateToken, put.updatebooks)
+router.put("/books/:bookId", middleWare.validateToken, put.updatebooks)
 
 router.put("/books/:bookId/review/:reviewId", put.updatereview)
 

@@ -7,7 +7,7 @@ const reviewModel = require("../model/reviewModel")
 
 
 
-const updatebooks = async function(req, res) {
+const updatebooks = async function (req, res) {
 
     try {
         let bookId = req.params.bookId;
@@ -41,40 +41,30 @@ const updatebooks = async function(req, res) {
 
 
         if (title) {
-
+            if (typeof title !== "string" || title.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid title" });
             const titleCheck = await bookModel.findOne({ title: title.trim() }) //.collation({ locale: 'en', strength: 2 })
             if (titleCheck) {
                 return res.status(400).send({ status: false, message: " this title already exist " })
             }
-            if (!title || title === undefined) {
-                return res.status(400).send({ status: false, msg: "title is not given" })
-            }
-            if (typeof title !== "string" || title.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid title" });
+
 
         }
         if (excerpt) {
-
-            if (!excerpt || excerpt === undefined) {
-                return res.status(400).send({ status: false, msg: "excerpt is not Given" })
-            }
             if (typeof excerpt !== "string" || excerpt.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid excerpt" });
 
         }
         if (ISBN) {
-
-            if (!/^\d{3}-?\d{10}/.test(ISBN)) {
+            if (typeof ISBN !== "string") return res.status(400).send({ status: false, msg: "ISBN should have string datatype" });
+            if (!/^\d{3}-?\d{10}/.test(ISBN.trim())) {
                 return res.status(400).send({ status: false, message: "  please enter valid ISBN " })
             }
-            const ISBNCheck = await bookModel.findOne({ ISBN: ISBN })
+            const ISBNCheck = await bookModel.findOne({ ISBN: ISBN.trim() })
             if (ISBNCheck) {
                 return res.status(400).send({ status: false, message: " this ISBN already exist " })
             }
         }
 
         if (releasedAt) {
-            if (!releasedAt || releasedAt === undefined) {
-                return res.status(400).send({ status: false, msg: "releasedAt is not given" })
-            }
             if (typeof releasedAt !== "string" || releasedAt.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid releasedAt and Should be in String" });
 
             let releasedAtt = /^^\d{4}[\/\-](0?[1-9]|1[012])[\/\-](0?[1-9]|[12][0-9]|3[01])$/.test(releasedAt.trim())
@@ -88,7 +78,7 @@ const updatebooks = async function(req, res) {
 
         const updatebooks = await bookModel.findOneAndUpdate({ _id: bookId }, {
             // $addToSet: { tags: tags, subcategory: subcategory },
-            $set: { title: title, excerpt: excerpt, ISBN: ISBN }
+            $set: { title: title?.trim(), excerpt: excerpt?.trim(), ISBN: ISBN?.trim(),releasedAt:releasedAt?.trim() }
         }, { new: true });
 
 
@@ -102,7 +92,7 @@ const updatebooks = async function(req, res) {
 
 }
 
-const updatereview = async function(req, res) {
+const updatereview = async function (req, res) {
 
     try {
         if (req.params.bookId == undefined)
@@ -134,10 +124,10 @@ const updatereview = async function(req, res) {
         if (!idCheckk) return res.status(400).send({ status: false, msg: "reviewId is not a type of objectId" })
 
         // book present or not
-        let status = await bookModel.findOne({ _id: bookId, isDeleted: false }, )
+        let status = await bookModel.findOne({ _id: bookId, isDeleted: false },)
         if (!status) return res.status(404).send({ msg: "this book is not present or Already Deleted" })
-            // review present or not
-        let statuss = await reviewModel.findOne({ _id: reviewId, isDeleted: false }, )
+        // review present or not
+        let statuss = await reviewModel.findOne({ _id: reviewId, isDeleted: false },)
         if (!statuss) return res.status(404).send({ msg: "this reviewer is not present or Already Deleted" })
 
 
@@ -152,20 +142,15 @@ const updatereview = async function(req, res) {
             if (typeof reviewedBy !== "string" || reviewedBy.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid reviwer Name" });
             reviewedBy = reviewedBy.trim()
         }
-        if (rating) {
-
-
+        if (rating) { 
             let rat = /^[0-5\.]{1,5}$/
-            if (!rat.test(rating)) {
+            if (!rat.test(rating )) {
                 return res.status(400).send({ status: false, msg: " review number should  digits only and should be 1 to 5" });
             }
 
         }
         if (review) {
 
-            if (!review || review.trim() === undefined) {
-                return res.status(400).send({ status: false, msg: "review is not given" })
-            }
             if (typeof review !== "string" || review.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid review" });
 
             data.review = data.review.trim()
@@ -173,7 +158,7 @@ const updatereview = async function(req, res) {
 
 
 
-        const updatereview = await reviewModel.findOneAndUpdate({ _id: reviewId, bookId: bookId }, {
+        const updatereview = await reviewModel.findOneAndUpdate({ _id: reviewId?.trim(), bookId: bookId?.trim() }, {
 
             $set: { review: review, rating: rating, reviewedBy: reviewedBy }
 
@@ -187,7 +172,7 @@ const updatereview = async function(req, res) {
 
         return res.status(200).send({ status: true, msg: "updated review with book", data: Doc });
     } catch (err) {
-        console.log(err.message)
+       // console.log(err.message)
         return res.status(500).send({ status: "error", error: err.message })
     }
 

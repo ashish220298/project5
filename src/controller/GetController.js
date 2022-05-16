@@ -12,24 +12,29 @@ const getBooks = async function(req, res) {
         if (data1.length === 0) {
             return res.status(404).send({ status: false, msg: "Book not found" })
         }
-
-        const { userId, category, subcategory } = data1
+        let { userId, category, subcategory } = data1
+        let data2 = {}
 
         //  if (Object.keys(data1).length === 0) {
         //   if (!(userId || category || subcategory)) return res.status(400).send({ status: false, msg: "not a valid filter" })
         // }
 
         if (userId) {
-            if (!mongoose.isValidObjectId(userId)) {
+            data2.userId=userId.trim()
+            if (!mongoose.isValidObjectId(data2.userId)) {
                 return res.status(400).send({ status: false, msg: "userId is not a type of objectId" })
             }
         }
+        if(category)
+        data2.category = category.trim()
+        if(subcategory)
+        data2.subcategory= subcategory.trim()
 
 
         //let filter = { isDeleted: false, $or: [{ userId: userId }, { category: category }, { subcategory: subcategory }] }
 
         let data = await bookModel.find({
-            $and: [{ isDeleted: false, ...data1 }],
+            $and: [{ isDeleted: false,...data2 }],
         }).select({ bookId: 1, title: 1, excerpt: 1, userId: 1, category: 1, subcategory: 1, reviews: 1, releasedAt: 1, }).sort({ title: 1 });
 
         if (!data) {

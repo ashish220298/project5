@@ -15,16 +15,19 @@ const createBooks = async function(req, res) {
 
         let { title, userId, excerpt, ISBN, category, subcategory, reviews, releasedAt, isDeleted } = data
         // Book is same Book or not
-        const check = await bookModel.findOne({ $or: [{ title: title }, { ISBN: ISBN }] })
-        console.table(check)
+        const check = await bookModel.findOne({ $or: [{ title: title?.trim() }, { ISBN: ISBN?.trim() }] })
+       // console.table(check)
         if (check) return res.status(400).send({ status: false, msg: "this book already exist" })
             // authorId validation
 
-        if (!userId) {
+        if (!userId ) {
             return res.status(400).send({ status: false, msg: "userId must be present" })
+        }if (typeof userId!=="string" ) {
+            return res.status(400).send({ status: false, msg: "userId datatype should be string" })
         }
+        userId = userId?.trim()
         let idCheck = mongoose.isValidObjectId(userId)
-        console.log(idCheck)
+        //console.log(idCheck)
         if (!idCheck) return res.status(400).send({ status: false, msg: "userId is not a type of objectId" })
 
         const id = await userModel.findById(userId)
@@ -38,7 +41,7 @@ const createBooks = async function(req, res) {
         if (token != userId) {
             return res.status(403).send({ status: false, msg: "You are not authorized to access this data" })
         }
-        console.log(title)
+        //console.log(title)
 
         // title validation
         if (!title || title === undefined) {
@@ -65,10 +68,13 @@ const createBooks = async function(req, res) {
         if (!ISBN || ISBN === undefined) {
             return res.status(400).send({ status: false, msg: "ISBN is not given" })
         }
+        if (typeof ISBN!=="string" ) {
+            return res.status(400).send({ status: false, msg: "ISBN datatype should be string" })
+        }
 
         let ISBNN = /^\d{3}-?\d{10}/.test(ISBN.trim())
         if (!ISBNN) {
-            return res.status(400).send({ status: false, msg: "ISBN is ony number" })
+            return res.status(400).send({ status: false, msg: "ISBN is ony number and should be in format like XXX-XXXXXXXXXX" })
         }
         data.ISBN = data.ISBN.trim()
             //reviews Validation
@@ -111,7 +117,7 @@ const createBooks = async function(req, res) {
         // subcategory validation
         if (!subcategory) return res.status(400).send({ status: false, msg: "subcategory should be present" })
 
-        if (subcategory || typeof subcategory == "string") {
+        if (subcategory ) {
             if (!Array.isArray(subcategory)) return res.status(400).send({ status: false, msg: "subcategory should be array of strings" })
 
             if (subcategory.some(sub => typeof sub === "string" && sub.trim().length === 0)) {
