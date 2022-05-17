@@ -28,7 +28,7 @@ const validateToken = async function(req, res, next) {
         console.log(decodedToken)
             // we create the  userId with the help of decodedToken and set in request userId
         req["userId"] = decodedToken.userId
-        console.log(req["authorId"])
+        console.log(req["userId"])
             // next function go to the next handler
         next()
 

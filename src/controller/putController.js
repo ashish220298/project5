@@ -78,7 +78,7 @@ const updatebooks = async function (req, res) {
 
         const updatebooks = await bookModel.findOneAndUpdate({ _id: bookId }, {
             // $addToSet: { tags: tags, subcategory: subcategory },
-            $set: { title: title?.trim(), excerpt: excerpt?.trim(), ISBN: ISBN?.trim(),releasedAt:releasedAt?.trim() }
+            $set: { title: title?.trim(), excerpt: excerpt?.trim(), ISBN: ISBN?.trim(), releasedAt: releasedAt?.trim() }
         }, { new: true });
 
 
@@ -142,9 +142,9 @@ const updatereview = async function (req, res) {
             if (typeof reviewedBy !== "string" || reviewedBy.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid reviwer Name" });
             reviewedBy = reviewedBy.trim()
         }
-        if (rating) { 
+        if (rating) {
             let rat = /^[0-5\.]{1,5}$/
-            if (!rat.test(rating )) {
+            if (!rat.test(rating)) {
                 return res.status(400).send({ status: false, msg: " review number should  digits only and should be 1 to 5" });
             }
 
@@ -172,7 +172,7 @@ const updatereview = async function (req, res) {
 
         return res.status(200).send({ status: true, msg: "updated review with book", data: Doc });
     } catch (err) {
-       // console.log(err.message)
+        // console.log(err.message)
         return res.status(500).send({ status: "error", error: err.message })
     }
 

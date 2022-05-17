@@ -14,7 +14,7 @@ const reviewsData = async function(req, res) {
         if (req.params.bookId == undefined)
             return res.status(400).send({ status: false, message: "bookId is required." });
         let bookId = req.params.bookId
-        console.log(bookId)
+      //  console.log(bookId)
         let data1 = req.body
 
         let { reviewedBy, rating, review } = data1
@@ -46,7 +46,7 @@ const reviewsData = async function(req, res) {
             if (typeof review !== "string" || review.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid review" });
             data1.review = data1.review.trim()
         }
-        let rat = /^[0-5\.]{1,5}$/
+        let rat = /^[0-5\.]{0,5}$/
         if (!rat.test(rating)) {
             return res.status(400).send({ status: false, msg: " review number should  digits only and should be 1 to 5" });
         }
