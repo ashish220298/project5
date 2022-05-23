@@ -1,5 +1,5 @@
-//const mongoose = require('mongoose');
-//const userModel = require("../model/userModel")
+const mongoose = require('mongoose');
+const userModel = require("../model/userModel")
 //const bookModel = require("../model/bookModel")
 //const reviewModel = require("../model/reviewModel")
 
@@ -92,85 +92,180 @@ const updatebooks = async function (req, res) {
 
 }
 
-const updatereview = async function (req, res) {
+const updateuser = async function (req, res) {
 
     try {
-        if (req.params.bookId == undefined)
+        if (req.params.userId == undefined)
             return res.status(400).send({ status: false, message: "bookId is required." });
-        if (req.params.reviewId == undefined)
-            return res.status(400).send({ status: false, message: "reviewId is required." });
-        let bookId = req.params.bookId;
-        let reviewId = req.params.reviewId;
+
+        let userId = req.params.userId;
+
 
 
 
         let data = req.body
 
-        let { review, rating, reviewedBy } = data // destructuring
+        let { address, fname, lname, phone, email, password, profileImage } = data // destructuring
 
         if (!data || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
 
-        if (!(review || rating || reviewedBy)) {
+        if (!(address || fname || lname || phone || email || password || profileImage)) {
             return res.status(404).send({ status: false, msg: "Plz enter valid keys for updation " })
         }
 
         // bookid Validation and reviwId validation
-        let idCheck = mongoose.isValidObjectId(bookId)
+        let idCheck = mongoose.isValidObjectId(userId)
 
-        if (!idCheck) return res.status(400).send({ status: false, msg: "bookId is not a type of objectId" })
+        if (!idCheck) return res.status(400).send({ status: false, msg: "user is not a type of objectId" })
 
-        let idCheckk = mongoose.isValidObjectId(reviewId)
+        // user present or not
+        let status = await userModel.findOne({ _id: userId },)
+        if (!status) return res.status(404).send({ msg: "this user is not present" })
 
-        if (!idCheckk) return res.status(400).send({ status: false, msg: "reviewId is not a type of objectId" })
-
-        // book present or not
-        let status = await bookModel.findOne({ _id: bookId, isDeleted: false },)
-        if (!status) return res.status(404).send({ msg: "this book is not present or Already Deleted" })
-        // review present or not
-        let statuss = await reviewModel.findOne({ _id: reviewId, isDeleted: false },)
-        if (!statuss) return res.status(404).send({ msg: "this reviewer is not present or Already Deleted" })
 
 
         if (status.isDeleted === true) return res.status(404).send({ status: false, msg: "this book is already deleted" })
 
-        if (statuss.isDeleted === true) return res.status(404).send({ status: false, msg: "this reviewr is already deleted" })
 
-        if (reviewedBy) {
-            if (!reviewedBy || reviewedBy === undefined) {
-                return res.status(400).send({ status: false, msg: "reviewedBy is not given" })
+        if (address) {
+            if (Object.prototype.toString.call(address) === "[object Object]") {
+
+                if (!address.shipping) {
+
+                    if (Object.prototype.toString.call(address.shipping) === "[object Object]") {
+
+                        if (!address.shipping.street) {
+                            if ( typeof address.shipping.street !== "string"|| address.billing.street.trim().toLowerCase().length===0 ) return res.status(400).send({ status: false, msg: "in address street must be present and should be string and enter a valied street" })
+                            address.shipping.street = address.shipping.street.trim().toLowerCase()
+                        }
+                        if (!address.shipping.city) {
+                            if ( typeof address.shipping.city !== "string" ) return res.status(400).send({ status: false, msg: "in address city must be present and should be string" })
+                            address.shipping.city = address.shipping.city.trim().toLowerCase()
+                        }
+                        if (!address.shipping.pincode) {
+                            if ( typeof address.shipping.pincode !== "string" ) return res.status(400).send({ status: false, msg: "in address pincode must be present present and should be string" })
+                            let pin = /^[0-9]{6}$/.test(address.shipping.pincode.trim())
+                            if (!pin) return res.status(400).send({ status: false, msg: " Address pincode Only have Number and 6 number only and should be string" })
+                            address.shipping.pincode = address.shipping.pincode.trim()
+                        }
+                    } else {
+                        return res.status(400).send({ status: false, msg: "shipping shipping should be in object form" })
+
+                    }
+
+                }
+                // billing validation 
+                if (!address.billing) {
+
+                    if (Object.prototype.toString.call(address.billing) === "[object Object]") {
+                        if (!address.billing.street) {
+                            if ( typeof address.billing.street !== "string" || address.billing.street.trim().toLowerCase().length===0 ) return res.status(400).send({ status: false, msg: "in billing street must be present and should be string " })
+                            address.billing.street = address.billing.street.trim().toLowerCase()
+                        }
+                        if (!address.billing.city) {
+                            if ( typeof address.billing.city !== "string" ) return res.status(400).send({ status: false, msg: "in billing city must be present and should be string" })
+                            address.billing.city = address.billing.city.trim().toLowerCase()
+                        }
+                        if (!address.billing.pincode) {
+                            if ( typeof address.billing.pincode !== "string" ) return res.status(400).send({ status: false, msg: "in billing pincode must be present present and should be string" })
+                            let pinn = /^[0-9]{6}$/.test(address.billing.pincode.trim())
+                            if (!pinn) return res.status(400).send({ status: false, msg: " billing pincode Only have Number and 6 number only and should be string" })
+                            address.billing.pincode = address.billing.pincode.trim()
+                        }
+                    }
+                    else {
+                        return res.status(400).send({ status: false, msg: "billing should be in object form" })
+                    }
+                }
+
             }
-            if (typeof reviewedBy !== "string" || reviewedBy.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid reviwer Name" });
-            reviewedBy = reviewedBy.trim()
+            else {
+                return res.status(400).send({ status: false, msg: "addresss should be in object form and present ad shipping and billing should be present in address" })
+            }
         }
-        if (rating) {
-            let rat = /^[0-5\.]{1,5}$/
-            if (!rat.test(rating)) {
-                return res.status(400).send({ status: false, msg: " review number should  digits only and should be 1 to 5" });
+        if (fname) {
+
+            if (typeof fname !== "string" || fname.trim().length === 0) return res.status(400).send({ status: false, msg: "fname should be string" });
+
+            let nname = /^[a-zA-Z ]{2,30}$/.test(fname.trim())
+            if (!nname) return res.status(400).send({ status: false, msg: "enter valid  fname" })
+
+            data.fname = data.fname.trim()
+
+        }
+        if (lname) {
+
+
+            if (typeof lname !== "string" || lname.trim().length === 0) return res.status(400).send({ status: false, msg: "lname should be string" });
+
+            let nnname = /^[a-zA-Z ]{2,30}$/.test(fname.trim())
+            if (!nnname) return res.status(400).send({ status: false, msg: "enter valid  lname" })
+
+            data.lname = data.lname.trim()
+        }
+
+        if (phone) {
+
+            if (typeof phone !== "string") {
+                return res.status(400).send({ status: false, msg: " phone number is mandatory and should be in string datatype" });
+            }
+            let mob = /^[0-9]{10}$/
+            if (!mob.test(phone.trim())) {
+                return res.status(400).send({ status: false, msg: " phone number should have 10 digits only" });
+            }
+            let call = await userModel.findOne({ phone: phone.trim() })
+
+            if (call) return res.status(400).send({ status: false, msg: "this phone is already present" })
+            data.phone = data.phone.trim()
+        }
+
+        if (email) {
+            if (typeof email != "string")
+                return res.status(400).send({ status: false, message: "Email must be in String datatype" })
+            let regx = /^([a-zA-Z0-9\._]+)@([a-zA-Z])+\.([a-z]+)(.[a-z])?$/
+
+            let x = regx.test(email.trim())
+            if (!x) {
+                return res.status(400).send({ status: false, msg: "write the correct format for email" })
+            }
+            let mail = await userModel.findOne({ email: email.trim().toLowerCase() })
+
+            if (mail) return res.status(400).send({ status: false, msg: "this email is already present" })
+            data.email = data.email.trim().toLowerCase()
+        }
+
+        if (password) {
+
+            if (typeof password !== "string" || password.trim().length === 0) return res.status(400).send({ status: false, msg: "enter valid password" });
+
+            let pass = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#\$%\^&\*\.])(?=.*[A-Z]).{8,15}$/.test(password.trim())
+
+            if (!pass) return res.status(400).send({ status: false, msg: "1.At least one digit, 2.At least one lowercase character,3.At least one uppercase character,4.At least one special character, 5. At least 8 characters in length, but no more than 16" })
+            data.password = data.password.trim()
+        }
+
+        if (profileImage) {
+
+
+            if (typeof profileImage !== "string" || profileImage.trim().length === 0) return res.status(400).send({ status: false, msg: "profileImage should be string" });
+
+            if (!(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%.\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:\+.~#?&//=]*)/.test(profileImage.trim()))) {
+                return res.status(400).send({ status: false, msg: "logoLink is a not valid" });
             }
 
         }
-        if (review) {
-
-            if (typeof review !== "string" || review.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid review" });
-
-            data.review = data.review.trim()
-        }
 
 
 
-        const updatereview = await reviewModel.findOneAndUpdate({ _id: reviewId?.trim(), bookId: bookId?.trim() }, {
+        const updateuser = await userModel.findOneAndUpdate({ _id: userId?.trim() }, {
 
-            $set: { review: review, rating: rating, reviewedBy: reviewedBy }
+            $set: { fname: fname, lname: lname, address: address, password: password, profileImage: profileImage, email: email, phone: phone }
 
-        }, { new: true }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
-        let Doc = {
-            Book: status,
-            reviewerData: updatereview
-
-        }
+        }, { new: true })//.select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
 
 
-        return res.status(200).send({ status: true, msg: "updated review with book", data: Doc });
+
+        return res.status(200).send({ status: true, msg: "updated User", data: updateuser });
     } catch (err) {
         // console.log(err.message)
         return res.status(500).send({ status: "error", error: err.message })
@@ -180,4 +275,4 @@ const updatereview = async function (req, res) {
 }
 
 //module.exports.updatebooks = updatebooks
-//module.exports.updatereview = updatereview
+module.exports.updateuser = updateuser

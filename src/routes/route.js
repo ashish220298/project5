@@ -4,7 +4,7 @@ const router = express.Router();
 
 //const loginController = require("../controller/loginController")
 //const middleWare = require("../middleWare/auth")
-//const put = require("../controller/putController")
+const put = require("../controller/putController")
 //const dController = require("../controller/DeleteControlle")
 const user = require("../controller/userController")
 //const post = require("../controller/bookController")
@@ -25,7 +25,7 @@ router.post("/register", user.createuser)
 
 //router.put("/books/:bookId", middleWare.validateToken, put.updatebooks)
 
-//router.put("/books/:bookId/review/:reviewId", put.updatereview)
+router.put("/user/:userId/profile", put.updateuser)
 
 //router.post("/books/:bookId/review", postt.reviewsData)
 
