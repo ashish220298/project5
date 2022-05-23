@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-const userModel = require("../model/userModel")
-const bookModel = require("../model/bookModel")
-const reviewModel = require("../model/reviewModel")
+//const mongoose = require('mongoose');
+//const userModel = require("../model/userModel")
+//const bookModel = require("../model/bookModel")
+//const reviewModel = require("../model/reviewModel")
 
 
 
@@ -87,6 +87,6 @@ const getBooksById = async function(req, res) {
 
 
 
-module.exports.getBooks = getBooks
+//module.exports.getBooks = getBooks
 
-module.exports.getBooksById = getBooksById
+//module.exports.getBooksById = getBooksById

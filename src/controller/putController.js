@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-const userModel = require("../model/userModel")
-const bookModel = require("../model/bookModel")
-const reviewModel = require("../model/reviewModel")
+//const mongoose = require('mongoose');
+//const userModel = require("../model/userModel")
+//const bookModel = require("../model/bookModel")
+//const reviewModel = require("../model/reviewModel")
 
 
 
@@ -179,5 +179,5 @@ const updatereview = async function (req, res) {
 
 }
 
-module.exports.updatebooks = updatebooks
-module.exports.updatereview = updatereview
+//module.exports.updatebooks = updatebooks
+//module.exports.updatereview = updatereview

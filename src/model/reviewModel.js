@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const ObjectId = mongoose.Schema.Types.ObjectId
+//const mongoose = require('mongoose');
+//const ObjectId = mongoose.Schema.Types.ObjectId
 
 const reviewSchema = new mongoose.Schema({
     bookId: {
@@ -37,4 +37,4 @@ const reviewSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-module.exports = mongoose.model('reviewr', reviewSchema)
+//module.exports = mongoose.model('reviewr', reviewSchema)

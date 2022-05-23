@@ -1,5 +1,5 @@
-const jwt = require("jsonwebtoken");
-const userModel = require("../model/userModel");
+//const jwt = require("jsonwebtoken");
+//const userModel = require("../model/userModel");
 
 
 
@@ -41,4 +41,4 @@ const loginUser = async function(req, res) {
     }
 }
 
-module.exports.loginUser = loginUser
+//module.exports.loginUser = loginUser

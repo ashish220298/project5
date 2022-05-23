@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
 //const userModel = require("../model/userModel")
-const bookModel = require("../model/bookModel")
+//const bookModel = require("../model/bookModel")
 
-const reviewModel = require("../model/reviewModel")
+//const reviewModel = require("../model/reviewModel")
 
 
 
@@ -81,4 +81,4 @@ const reviewsData = async function(req, res) {
 
 
 
-module.exports.reviewsData = reviewsData
+//module.exports.reviewsData = reviewsData

@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
 
-const bookModel = require("../model/bookModel");
-const reviewModel = require('../model/reviewModel');
+//const bookModel = require("../model/bookModel");
+//const reviewModel = require('../model/reviewModel');
 
 
 
@@ -102,6 +102,6 @@ const reviewdelet = async function(req, res) {
 }
 
 
-module.exports.deletById = deletById
+//module.exports.deletById = deletById
 
-module.exports.reviewdelet = reviewdelet
+//module.exports.reviewdelet = reviewdelet

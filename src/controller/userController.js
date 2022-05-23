@@ -4,38 +4,55 @@ const userModel = require("../model/userModel")
 
 
 
-const createuser = async(req, res) => {
+const createuser = async (req, res) => {
     try {
         let data = req.body
-            //  data validation
+        //  data validation
 
-        let { phone, name, title, email, password, address } = data
+        let { phone, fname, lname, profileImage, email, password, address } = data
 
 
         if (data === undefined || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
 
-        // name validation
-       // console.log(typeof name)
-        if (!name ||name === undefined) return res.status(400).send({ status: false, msg: "first name must be present" });
-        if (typeof name !== "string" || name.trim().length === 0) return res.status(400).send({ status: false, msg: "fname should be string" });
+        // fname validation
+        // console.log(typeof name)
+        if (!fname || fname === undefined) return res.status(400).send({ status: false, msg: "first name must be present" });
+        if (typeof fname !== "string" || fname.trim().length === 0) return res.status(400).send({ status: false, msg: "fname should be string" });
 
-        let nname = /^[a-zA-Z ]{2,30}$/.test(name.trim())
-        if (!nname) return res.status(400).send({ status: false, msg: "enter valid  name" })
+        let nname = /^[a-zA-Z ]{2,30}$/.test(fname.trim())
+        if (!nname) return res.status(400).send({ status: false, msg: "enter valid  fname" })
 
-        data.name = data.name.trim()
+        data.fname = data.fname.trim()
 
 
+        // lname validation
+
+        if (!lname || lname === undefined) return res.status(400).send({ status: false, msg: "lirst name must be present" });
+        if (typeof lname !== "string" || lname.trim().length === 0) return res.status(400).send({ status: false, msg: "lname should be string" });
+
+        let nnname = /^[a-zA-Z ]{2,30}$/.test(fname.trim())
+        if (!nnname) return res.status(400).send({ status: false, msg: "enter valid  lname" })
+
+        data.lname = data.lname.trim()
         // title validation
-        if (!title) return res.status(400).send({ status: false, msg: "title must be present" });
-        if (typeof title !== "string") return res.status(400).send({ status: false, msg: "title should be string" });
-        if (!(["Mr", "Mrs", "Miss"].includes(data.title.trim()))) return res.status(400).send({ status: false, msg: "plz write valid title" })
-        data.title = data.title.trim()
-            // email validation
+        // if (!title) return res.status(400).send({ status: false, msg: "title must be present" });
+        //  if (typeof title !== "string") return res.status(400).send({ status: false, msg: "title should be string" });
+        // if (!(["Mr", "Mrs", "Miss"].includes(data.title.trim()))) return res.status(400).send({ status: false, msg: "plz write valid title" })
+        //  data.title = data.title.trim()
+
+        if (!profileImage || profileImage === undefined) return res.status(400).send({ status: false, msg: "profileImage must be present" });
+        if (typeof profileImage !== "string" || profileImage.trim().length === 0) return res.status(400).send({ status: false, msg: "profileImage should be string" });
+
+        if (!(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%.\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:\+.~#?&//=]*)/.test(profileImage.trim()))) {
+            return res.status(400).send({ status: false, msg: "logoLink is a not valid" });
+        }
+
+        // email validation
         if (!email) {
             return res.status(400).send({ status: false, msg: "email must be present" });
         }
-        if(typeof email!="string")
-        return res.status(400).send({status:false,message:"Email must be in String datatype"})
+        if (typeof email != "string")
+            return res.status(400).send({ status: false, message: "Email must be in String datatype" })
         let regx = /^([a-zA-Z0-9\._]+)@([a-zA-Z])+\.([a-z]+)(.[a-z])?$/
 
         let x = regx.test(email.trim())
@@ -51,14 +68,14 @@ const createuser = async(req, res) => {
         if (!password) return res.status(400).send({ status: false, msg: "plz write the password" });
         if (typeof password !== "string" || password.trim().length === 0) return res.status(400).send({ status: false, msg: "enter valid password" });
 
-        let pass = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#\$%\^&\*])(?=.*[A-Z]).{8,15}$/.test(password.trim())
+        let pass = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#\$%\^&\*\.])(?=.*[A-Z]).{8,15}$/.test(password.trim())
 
         if (!pass) return res.status(400).send({ status: false, msg: "1.At least one digit, 2.At least one lowercase character,3.At least one uppercase character,4.At least one special character, 5. At least 8 characters in length, but no more than 16" })
         data.password = data.password.trim()
-            // Phone va
-            if(typeof phone!=="string") {
-                return res.status(400).send({ status: false, msg: " phone number is mandatory and should be in string datatype" });  
-            }
+        // Phone va
+        if (typeof phone !== "string") {
+            return res.status(400).send({ status: false, msg: " phone number is mandatory and should be in string datatype" });
+        }
         let mob = /^[0-9]{10}$/
         if (!mob.test(phone.trim())) {
             return res.status(400).send({ status: false, msg: " phone number should have 10 digits only" });
@@ -67,20 +84,51 @@ const createuser = async(req, res) => {
 
         if (call) return res.status(400).send({ status: false, msg: "this phone is already present" })
         data.phone = data.phone.trim()
-            // address validation 
-        if (address || Object.prototype.toString.call(address) === "[object Object]") {
-            if (!address.street || typeof address.street!=="string" || !address.street.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in address street must be present and should be string" })
-            address.street = address.street.trim().toLowerCase()
-            if (!address.city ||typeof address.city!=="string" || !address.city.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in address city must be present and should be string" })
-            address.city = address.city.trim().toLowerCase()
-            if (!address.pincode ||typeof address.pincode!=="string" || !address.pincode.trim()) return res.status(400).send({ status: false, msg: "in address pincode must be present present and should be string" })
-            let pin = /^[0-9]{6}$/.test(address.pincode.trim())
-            if (!pin) return res.status(400).send({ status: false, msg: " Address pincode Only have Number and 6 number only and should be string" })
-            address.pincode = address.pincode.trim()
+        // address validation 
+        if(!address) return  res.status(400).send({ status: false, msg: "addresss should be in object form and present ad shipping and billing should be present in address" })
+       
+        if ( Object.prototype.toString.call(address) === "[object Object]") {
+
+               if(!address.shipping) return res.status(400).send({ status: false, msg: " shipping should be present" })
+
+            if ( Object.prototype.toString.call(address.shipping) === "[object Object]") {
+
+
+                if (!address.shipping.street || typeof address.shipping.street !== "string" || !address.shipping.street.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in address street must be present and should be string and enter a valied street" })
+                address.shipping.street = address.shipping.street.trim().toLowerCase()
+                if (!address.shipping.city || typeof address.shipping.city !== "string" || !address.shipping.city.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in address city must be present and should be string" })
+                address.shipping.city = address.shipping.city.trim().toLowerCase()
+                if (!address.shipping.pincode || typeof address.shipping.pincode !== "string" || !address.shipping.pincode.trim()) return res.status(400).send({ status: false, msg: "in address pincode must be present present and should be string" })
+                let pin = /^[0-9]{6}$/.test(address.shipping.pincode.trim())
+                if (!pin) return res.status(400).send({ status: false, msg: " Address pincode Only have Number and 6 number only and should be string" })
+                address.shipping.pincode = address.shipping.pincode.trim()
+            } else {
+                return res.status(400).send({ status: false, msg: "shipping shipping should be in object form" })
+
+            }
+       
+
+        // billing validation 
+        if(!address.billing) return res.status(400).send({ status: false, msg: " billing should be present" })
+
+        if ( Object.prototype.toString.call(address.billing) === "[object Object]") {
+            if (!address.billing.street || typeof address.billing.street !== "string" || !address.billing.street.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in billing street must be present and should be string " })
+            address.billing.street = address.billing.street.trim().toLowerCase()
+            if (!address.billing.city || typeof address.billing.city !== "string" || !address.billing.city.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in billing city must be present and should be string" })
+            address.billing.city = address.billing.city.trim().toLowerCase()
+            if (!address.billing.pincode || typeof address.billing.pincode !== "string" || !address.billing.pincode.trim()) return res.status(400).send({ status: false, msg: "in billing pincode must be present present and should be string" })
+            let pinn = /^[0-9]{6}$/.test(address.billing.pincode.trim())
+            if (!pinn) return res.status(400).send({ status: false, msg: " billing pincode Only have Number and 6 number only and should be string" })
+            address.billing.pincode = address.billing.pincode.trim()
         }
         else {
-            return res.status(400).send({status:false,msg:"address should be in object form"})
+            return res.status(400).send({ status: false, msg: "billing should be in object form" })
         }
+
+    }
+    else {
+        return res.status(400).send({ status: false, msg: "addresss should be in object form and present ad shipping and billing should be present in address" })
+    }
         let user = await userModel.create(data)
 
         return res.status(201).send({ status: true, data: user })
