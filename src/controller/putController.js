@@ -3,6 +3,46 @@ const userModel = require("../model/userModel")
 //const bookModel = require("../model/bookModel")
 //const reviewModel = require("../model/reviewModel")
 
+const bcrypt = require("bcrypt")
+const aws = require("aws-sdk")
+const multer = require("multer");
+const { json } = require('express/lib/response');
+
+// connect AWS
+aws.config.update({
+    accessKeyId: "AKIAY3L35MCRUJ6WPO6J",
+    secretAccessKey: "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",
+    region: "ap-south-1"
+})
+
+let uploadFile = async (file) => {
+    return new Promise(function (resolve, reject) {
+        // this function will upload file to aws and return the link
+        let s3 = new aws.S3({ apiVersion: '2006-03-01' }); // we will be using the s3 service of aws
+
+        var uploadParams = {
+            ACL: "public-read",
+            Bucket: "classroom-training-bucket",  //HERE
+            Key: "Arijit/" + file.originalname, //HERE 
+            Body: file.buffer
+        }
+
+
+        s3.upload(uploadParams, function (err, data) {
+            if (err) {
+                return reject({ "error": err })
+            }
+            // console.log(data)
+            //  console.log("file uploaded succesfully")
+            return resolve(data.Location)
+        })
+
+        // let data= await s3.upload( uploadParams)
+        // if( data) return data.Location
+        // else return "there is an error"
+
+    })
+}
 
 
 
@@ -105,13 +145,18 @@ const updateuser = async function (req, res) {
 
         let data = req.body
 
-        let { address, fname, lname, phone, email, password, profileImage } = data // destructuring
+        let files = req.files
 
-        if (!data || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
 
-        if (!(address || fname || lname || phone || email || password || profileImage)) {
-            return res.status(404).send({ status: false, msg: "Plz enter valid keys for updation " })
-        }
+
+
+        let { address, fname, lname, phone, email, password, } = data // destructuring
+
+        // if (!data || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
+
+        //if (!(address || fname || lname || phone || email || password || profileImage)) {
+        // return res.status(404).send({ status: false, msg: "Plz enter valid keys for updation " })
+        // }
 
         // bookid Validation and reviwId validation
         let idCheck = mongoose.isValidObjectId(userId)
@@ -135,15 +180,15 @@ const updateuser = async function (req, res) {
                     if (Object.prototype.toString.call(address.shipping) === "[object Object]") {
 
                         if (!address.shipping.street) {
-                            if ( typeof address.shipping.street !== "string"|| address.billing.street.trim().toLowerCase().length===0 ) return res.status(400).send({ status: false, msg: "in address street must be present and should be string and enter a valied street" })
+                            if (typeof address.shipping.street !== "string" || address.billing.street.trim().toLowerCase().length === 0) return res.status(400).send({ status: false, msg: "in address street must be present and should be string and enter a valied street" })
                             address.shipping.street = address.shipping.street.trim().toLowerCase()
                         }
                         if (!address.shipping.city) {
-                            if ( typeof address.shipping.city !== "string" ) return res.status(400).send({ status: false, msg: "in address city must be present and should be string" })
+                            if (typeof address.shipping.city !== "string") return res.status(400).send({ status: false, msg: "in address city must be present and should be string" })
                             address.shipping.city = address.shipping.city.trim().toLowerCase()
                         }
                         if (!address.shipping.pincode) {
-                            if ( typeof address.shipping.pincode !== "string" ) return res.status(400).send({ status: false, msg: "in address pincode must be present present and should be string" })
+                            if (typeof address.shipping.pincode !== "string") return res.status(400).send({ status: false, msg: "in address pincode must be present present and should be string" })
                             let pin = /^[0-9]{6}$/.test(address.shipping.pincode.trim())
                             if (!pin) return res.status(400).send({ status: false, msg: " Address pincode Only have Number and 6 number only and should be string" })
                             address.shipping.pincode = address.shipping.pincode.trim()
@@ -159,15 +204,15 @@ const updateuser = async function (req, res) {
 
                     if (Object.prototype.toString.call(address.billing) === "[object Object]") {
                         if (!address.billing.street) {
-                            if ( typeof address.billing.street !== "string" || address.billing.street.trim().toLowerCase().length===0 ) return res.status(400).send({ status: false, msg: "in billing street must be present and should be string " })
+                            if (typeof address.billing.street !== "string" || address.billing.street.trim().toLowerCase().length === 0) return res.status(400).send({ status: false, msg: "in billing street must be present and should be string " })
                             address.billing.street = address.billing.street.trim().toLowerCase()
                         }
                         if (!address.billing.city) {
-                            if ( typeof address.billing.city !== "string" ) return res.status(400).send({ status: false, msg: "in billing city must be present and should be string" })
+                            if (typeof address.billing.city !== "string") return res.status(400).send({ status: false, msg: "in billing city must be present and should be string" })
                             address.billing.city = address.billing.city.trim().toLowerCase()
                         }
                         if (!address.billing.pincode) {
-                            if ( typeof address.billing.pincode !== "string" ) return res.status(400).send({ status: false, msg: "in billing pincode must be present present and should be string" })
+                            if (typeof address.billing.pincode !== "string") return res.status(400).send({ status: false, msg: "in billing pincode must be present present and should be string" })
                             let pinn = /^[0-9]{6}$/.test(address.billing.pincode.trim())
                             if (!pinn) return res.status(400).send({ status: false, msg: " billing pincode Only have Number and 6 number only and should be string" })
                             address.billing.pincode = address.billing.pincode.trim()
@@ -238,34 +283,63 @@ const updateuser = async function (req, res) {
 
             if (typeof password !== "string" || password.trim().length === 0) return res.status(400).send({ status: false, msg: "enter valid password" });
 
-            let pass = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#\$%\^&\*\.])(?=.*[A-Z]).{8,15}$/.test(password.trim())
+            let pass = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#\$%\^&\*\.])(?=.*[A-Z]).{8,200}$/.test(password.trim())
 
             if (!pass) return res.status(400).send({ status: false, msg: "1.At least one digit, 2.At least one lowercase character,3.At least one uppercase character,4.At least one special character, 5. At least 8 characters in length, but no more than 16" })
-            data.password = data.password.trim()
+
+            const salt = await bcrypt.genSalt(10)
+
+            let passs = await bcrypt.hash(data.password, salt)
+
+            const updateuser = await userModel.findOneAndUpdate({ _id: userId?.trim() }, {
+
+                $set: {  password: passs }
+
+            }, { new: true })
+
+
+
+            // return res.status(200).send({ status: true, msg: "updated User", data: updateuser });
         }
+        //let files = req.files
+        if (files) {
 
-        if (profileImage) {
 
 
-            if (typeof profileImage !== "string" || profileImage.trim().length === 0) return res.status(400).send({ status: false, msg: "profileImage should be string" });
 
-            if (!(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%.\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:\+.~#?&//=]*)/.test(profileImage.trim()))) {
-                return res.status(400).send({ status: false, msg: "logoLink is a not valid" });
+
+            // let files = req.files
+            // console.log(files)
+            if (files && files.length > 0) {
+                //upload to s3 and get the uploaded link
+                // res.send the link back to frontend/postman
+                let uploadedFileURL = await uploadFile(files[0])
+                data.profileImage = uploadedFileURL
+                let Image = data.profileImage
+                // return res.status(201).send({ status: true, data: user })
+
+                const update = await userModel.findOneAndUpdate({ _id: userId?.trim() }, {
+
+                    $set: { profileImage: Image }
+
+                }, { new: true })
             }
 
         }
 
-
+        //console.log(files)
 
         const updateuser = await userModel.findOneAndUpdate({ _id: userId?.trim() }, {
 
-            $set: { fname: fname, lname: lname, address: address, password: password, profileImage: profileImage, email: email, phone: phone }
+            $set: { fname: fname, lname: lname, address: address, email: email, phone: phone }
 
         }, { new: true })//.select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
 
+        const user = await userModel.findById(userId)
 
 
-        return res.status(200).send({ status: true, msg: "updated User", data: updateuser });
+
+        return res.status(200).send({ status: true, msg: "updated User", data: user });
     } catch (err) {
         // console.log(err.message)
         return res.status(500).send({ status: "error", error: err.message })

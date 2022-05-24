@@ -8,7 +8,7 @@ const put = require("../controller/putController")
 //const dController = require("../controller/DeleteControlle")
 const user = require("../controller/userController")
 //const post = require("../controller/bookController")
-//const get = require("../controller/GetController")
+const get = require("../controller/GetController")
 //const postt = require("../controller/reviewController")
 
 
@@ -21,7 +21,7 @@ router.post("/login", loginController.loginUser)
 
 //router.get("/books", get.getBooks)
 
-//router.get("/books/:bookId", get.getBooksById)
+router.get("/user/:userId/profile", get.getUserById)
 
 //router.put("/books/:bookId", middleWare.validateToken, put.updatebooks)
 
