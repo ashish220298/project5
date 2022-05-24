@@ -45,28 +45,15 @@ let uploadFile = async (file) => {
 
 const createuser = async (req, res) => {
     try {
-        let data = req.body
+        let  data = JSON.parse(JSON.stringify(req.body))
         //  data validation
 
         let { phone, fname, lname, profileImage, email, password, address } = data
 
 
-        if (data === undefined || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
+        if (!data||Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
 
-        let files = req.files
-        if (files && files.length > 0) {
-            //upload to s3 and get the uploaded link
-            // res.send the link back to frontend/postman
-            let uploadedFileURL = await uploadFile(files[0])
-            data.profileImage = uploadedFileURL
-            // user Creation
-            const user = await userModel.create(data)
-            // return res.status(201).send({ status: true, data: user })
-            res.status(201).send({ msg: "user profileImage uploaded succesfully and user Creation Successfull", Data: user })
-        }
-        else {
-            res.status(400).send({ msg: "No ProfileImage found" })
-        }
+       
         // fname validation
         // console.log(typeof name)
         if (!fname || fname === undefined) return res.status(400).send({ status: false, msg: "first name must be present" });
@@ -184,9 +171,22 @@ const createuser = async (req, res) => {
     else {
         return res.status(400).send({ status: false, msg: "addresss should be in object form and present ad shipping and billing should be present in address" })
     }
-        let user = await userModel.create(data)
 
-        return res.status(201).send({ status: true, data: user })
+    let files = req.files
+    if (files && files.length > 0) {
+        //upload to s3 and get the uploaded link
+        // res.send the link back to frontend/postman
+        let uploadedFileURL = await uploadFile(files[0])
+        data.profileImage = uploadedFileURL
+        // user Creation
+        const user = await userModel.create(data)
+        // return res.status(201).send({ status: true, data: user })
+        res.status(201).send({ msg: "user profileImage uploaded succesfully and user Creation Successfull", Data: user })
+    }
+    else {
+        res.status(400).send({ msg: "No ProfileImage found" })
+    }
+     
     } catch (err) {
         res.status(500).send({ status: "error", msg: err.message })
     }

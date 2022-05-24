@@ -5,11 +5,11 @@ const mongoose = require('mongoose');
 const app = express();
 const multer= require("multer");
 const { AppConfig } = require('aws-sdk');
-app.use( multer().any())
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//app.use( multer().any())
+app.use( multer().any())
 mongoose.connect("mongodb+srv://arijit8637:WTqiGxjIFMSg5nxn@cluster0.u6fy9.mongodb.net/project-Shopping-Cart?retryWrites=true&w=majority", {
         useNewUrlParser: true
     })
