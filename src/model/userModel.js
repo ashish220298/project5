@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
         require: true,
         type: String,
         minlength: 8,
-        maxlength: 15
+       
 
     },
     profileImage: {

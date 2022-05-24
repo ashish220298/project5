@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 
-//const loginController = require("../controller/loginController")
+const loginController = require("../controller/loginController")
 //const middleWare = require("../middleWare/auth")
 const put = require("../controller/putController")
 //const dController = require("../controller/DeleteControlle")
@@ -15,7 +15,7 @@ const user = require("../controller/userController")
 
 router.post("/register", user.createuser)
 
-//router.post("/login", loginController.loginUser)
+router.post("/login", loginController.loginUser)
 
 //router.post("/books", middleWare.validateToken, post.createBooks)
 

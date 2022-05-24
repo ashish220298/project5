@@ -1,7 +1,46 @@
 const { resetWatchers } = require("nodemon/lib/monitor/watch")
 const userModel = require("../model/userModel")
 
+const bcrypt = require("bcrypt")
+const aws = require("aws-sdk")
+const multer = require("multer");
+const { json } = require('express/lib/response');
 
+  // connect AWS
+aws.config.update({
+    accessKeyId: "AKIAY3L35MCRUJ6WPO6J",
+    secretAccessKey: "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",
+    region: "ap-south-1"
+})
+
+let uploadFile = async (file) => {
+    return new Promise(function (resolve, reject) {
+        // this function will upload file to aws and return the link
+        let s3 = new aws.S3({ apiVersion: '2006-03-01' }); // we will be using the s3 service of aws
+
+        var uploadParams = {
+            ACL: "public-read",
+            Bucket: "classroom-training-bucket",  //HERE
+            Key: "Arijit/" + file.originalname, //HERE 
+            Body: file.buffer
+        }
+
+
+        s3.upload(uploadParams, function (err, data) {
+            if (err) {
+                return reject({ "error": err })
+            }
+            console.log(data)
+            console.log("file uploaded succesfully")
+            return resolve(data.Location)
+        })
+
+        // let data= await s3.upload( uploadParams)
+        // if( data) return data.Location
+        // else return "there is an error"
+
+    })
+}
 
 
 const createuser = async (req, res) => {
@@ -14,6 +53,20 @@ const createuser = async (req, res) => {
 
         if (data === undefined || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
 
+        let files = req.files
+        if (files && files.length > 0) {
+            //upload to s3 and get the uploaded link
+            // res.send the link back to frontend/postman
+            let uploadedFileURL = await uploadFile(files[0])
+            data.profileImage = uploadedFileURL
+            // user Creation
+            const user = await userModel.create(data)
+            // return res.status(201).send({ status: true, data: user })
+            res.status(201).send({ msg: "user profileImage uploaded succesfully and user Creation Successfull", Data: user })
+        }
+        else {
+            res.status(400).send({ msg: "No ProfileImage found" })
+        }
         // fname validation
         // console.log(typeof name)
         if (!fname || fname === undefined) return res.status(400).send({ status: false, msg: "first name must be present" });
@@ -40,12 +93,12 @@ const createuser = async (req, res) => {
         // if (!(["Mr", "Mrs", "Miss"].includes(data.title.trim()))) return res.status(400).send({ status: false, msg: "plz write valid title" })
         //  data.title = data.title.trim()
 
-        if (!profileImage || profileImage === undefined) return res.status(400).send({ status: false, msg: "profileImage must be present" });
-        if (typeof profileImage !== "string" || profileImage.trim().length === 0) return res.status(400).send({ status: false, msg: "profileImage should be string" });
+       // if (!profileImage || profileImage === undefined) return res.status(400).send({ status: false, msg: "profileImage must be present" });
+       // if (typeof profileImage !== "string" || profileImage.trim().length === 0) return res.status(400).send({ status: false, msg: "profileImage should be string" });
 
-        if (!(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%.\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:\+.~#?&//=]*)/.test(profileImage.trim()))) {
-            return res.status(400).send({ status: false, msg: "logoLink is a not valid" });
-        }
+       // if (!(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%.\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:\+.~#?&//=]*)/.test(profileImage.trim()))) {
+          //  return res.status(400).send({ status: false, msg: "logoLink is a not valid" });
+       // }
 
         // email validation
         if (!email) {
@@ -68,10 +121,12 @@ const createuser = async (req, res) => {
         if (!password) return res.status(400).send({ status: false, msg: "plz write the password" });
         if (typeof password !== "string" || password.trim().length === 0) return res.status(400).send({ status: false, msg: "enter valid password" });
 
-        let pass = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#\$%\^&\*\.])(?=.*[A-Z]).{8,15}$/.test(password.trim())
+        let pass = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#\$%\^&\*\.])(?=.*[A-Z]).{8,200}$/.test(password.trim())
 
         if (!pass) return res.status(400).send({ status: false, msg: "1.At least one digit, 2.At least one lowercase character,3.At least one uppercase character,4.At least one special character, 5. At least 8 characters in length, but no more than 16" })
-        data.password = data.password.trim()
+        const salt = await bcrypt.genSalt(10)
+
+        data.password = await bcrypt.hash(data.password,salt)
         // Phone va
         if (typeof phone !== "string") {
             return res.status(400).send({ status: false, msg: " phone number is mandatory and should be in string datatype" });
