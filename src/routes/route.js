@@ -9,7 +9,7 @@ const put = require("../controller/putController")
 const user = require("../controller/userController")
 //const post = require("../controller/bookController")
 const get = require("../controller/GetController")
-//const postt = require("../controller/reviewController")
+const postt = require("../controller/productController")
 
 
 
@@ -19,7 +19,9 @@ router.post("/login", loginController.loginUser)
 
 //router.post("/books", middleWare.validateToken, post.createBooks)
 
-//router.get("/books", get.getBooks)
+router.post("/products", postt.createProduct)
+
+router.get("/products", get.getproduct)
 
 router.get("/user/:userId/profile", get.getUserById)
 
@@ -27,7 +29,8 @@ router.get("/user/:userId/profile", get.getUserById)
 
 router.put("/user/:userId/profile", put.updateuser)
 
-//router.post("/books/:bookId/review", postt.reviewsData)
+router.put("/products/:productId", put.updateProduct)
+
 
 //router.delete("/books/:bookId", middleWare.validateToken, dController.deletById)
 

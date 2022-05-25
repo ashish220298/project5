@@ -25,15 +25,17 @@ const loginUser = async function (req, res) {
         let user = await userModel.findOne({ email: userName });
         if (!user)
             return res.status(404).send({ status: false, msg: "Please enter a valid email address and password" });
-        bcrypt.compare(password, user.password, function (err, result) {
+         
+         bcrypt.compare(password, user.password, function (err, result) {
+           // console.log(a)
             // Creating token Under Using userId with secret Key
             if (result) {
                 let token = jwt.sign({
                     userId: user._id.toString(),
-                    group: "13",
+                    group: "11",
                     project: 3,
                 },
-                    "project-3-group-13", { expiresIn: '3600s' }
+                    "project-5-group-11", { expiresIn: '3600s' }
                 );
 
                 // Set This token In response in Header and Also In body
@@ -46,8 +48,10 @@ const loginUser = async function (req, res) {
                 }
                 return res.status(200).send({ status: true, msg: "User Login SuccessFull", data: userData });
             }
-            else if(err) return res.status(201).send({ status: true, message: "Please provide correct password" })
+            else  return res.status(201).send({ status: true, message: "Please provide correct password" })
         })
+
+       
     } catch (err) {
         console.log(err.message)
         return res.status(500).send({ status: "error", msg: err.message })

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const userModel = require("../model/userModel")
 //const bookModel = require("../model/bookModel")
 //const reviewModel = require("../model/reviewModel")
-
+const productModel = require("../model/productModel")
 const bcrypt = require("bcrypt")
 const aws = require("aws-sdk")
 const multer = require("multer");
@@ -148,7 +148,7 @@ const updateuser = async function (req, res) {
         let files = req.files
 
 
-
+        const upadatedData = {}
 
         let { address, fname, lname, phone, email, password, } = data // destructuring
 
@@ -169,58 +169,55 @@ const updateuser = async function (req, res) {
 
 
 
-        if (status.isDeleted === true) return res.status(404).send({ status: false, msg: "this book is already deleted" })
+        if (status.isDeleted === true) return res.status(404).send({ status: false, msg: "this user is already deleted" })
 
-
+        if (address.shipping.street) {
+            if (address.billing.street.trim().toLowerCase().length === 0) return res.status(400).send({ status: false, msg: "in address street must be present and should be string and enter a valied street" })
+            address.shipping.street = address.shipping.street.trim().toLowerCase()
+        }
         if (address) {
+
+            // if (address.shipping) return res.status(400).send({ status: false, msg: " shipping should be present" })
             if (Object.prototype.toString.call(address) === "[object Object]") {
 
-                if (!address.shipping) {
+                if (address.shipping) {
+
+                    // console.log(add)
 
                     if (Object.prototype.toString.call(address.shipping) === "[object Object]") {
 
-                        if (!address.shipping.street) {
-                            if (typeof address.shipping.street !== "string" || address.billing.street.trim().toLowerCase().length === 0) return res.status(400).send({ status: false, msg: "in address street must be present and should be string and enter a valied street" })
-                            address.shipping.street = address.shipping.street.trim().toLowerCase()
-                        }
-                        if (!address.shipping.city) {
-                            if (typeof address.shipping.city !== "string") return res.status(400).send({ status: false, msg: "in address city must be present and should be string" })
-                            address.shipping.city = address.shipping.city.trim().toLowerCase()
-                        }
-                        if (!address.shipping.pincode) {
-                            if (typeof address.shipping.pincode !== "string") return res.status(400).send({ status: false, msg: "in address pincode must be present present and should be string" })
-                            let pin = /^[0-9]{6}$/.test(address.shipping.pincode.trim())
-                            if (!pin) return res.status(400).send({ status: false, msg: " Address pincode Only have Number and 6 number only and should be string" })
-                            address.shipping.pincode = address.shipping.pincode.trim()
-                        }
+
+                        if (!address.shipping.street || typeof address.shipping.street !== "string" || !address.shipping.street.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in address street must be present and should be string and enter a valied street" })
+                        upadatedData[address.shipping.street] = address.shipping.street.trim().toLowerCase()
+                        if (!address.shipping.city || typeof address.shipping.city !== "string" || !address.shipping.city.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in address city must be present and should be string" })
+                        upadatedData[address.shipping.city] = address.shipping.city.trim().toLowerCase()
+                        if (!address.shipping.pincode || typeof address.shipping.pincode !== "string" || !address.shipping.pincode.trim()) return res.status(400).send({ status: false, msg: "in address pincode must be present present and should be string" })
+                        let pin = /^[0-9]{6}$/.test(address.shipping.pincode.trim())
+                        if (!pin) return res.status(400).send({ status: false, msg: " Address pincode Only have Number and 6 number only and should be string" })
+                        upadatedData[address.shipping.pincode] = address.shipping.pincode.trim()
                     } else {
-                        return res.status(400).send({ status: false, msg: "shipping shipping should be in object form" })
+                        return res.status(400).send({ status: false, msg: "shipping should be in object form" })
 
                     }
+                } else { return res.status(400).send({ status: false, msg: "shipping address Should be present" }) }
 
-                }
                 // billing validation 
-                if (!address.billing) {
+                if (address.billing) {
 
                     if (Object.prototype.toString.call(address.billing) === "[object Object]") {
-                        if (!address.billing.street) {
-                            if (typeof address.billing.street !== "string" || address.billing.street.trim().toLowerCase().length === 0) return res.status(400).send({ status: false, msg: "in billing street must be present and should be string " })
-                            address.billing.street = address.billing.street.trim().toLowerCase()
-                        }
-                        if (!address.billing.city) {
-                            if (typeof address.billing.city !== "string") return res.status(400).send({ status: false, msg: "in billing city must be present and should be string" })
-                            address.billing.city = address.billing.city.trim().toLowerCase()
-                        }
-                        if (!address.billing.pincode) {
-                            if (typeof address.billing.pincode !== "string") return res.status(400).send({ status: false, msg: "in billing pincode must be present present and should be string" })
-                            let pinn = /^[0-9]{6}$/.test(address.billing.pincode.trim())
-                            if (!pinn) return res.status(400).send({ status: false, msg: " billing pincode Only have Number and 6 number only and should be string" })
-                            address.billing.pincode = address.billing.pincode.trim()
-                        }
+                        if (!address.billing.street || typeof address.billing.street !== "string" || !address.billing.street.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in billing street must be present and should be string " })
+                        address.billing.street = address.billing.street.trim().toLowerCase()
+                        if (!address.billing.city || typeof address.billing.city !== "string" || !address.billing.city.trim().toLowerCase()) return res.status(400).send({ status: false, msg: "in billing city must be present and should be string" })
+                        address.billing.city = address.billing.city.trim().toLowerCase()
+                        if (!address.billing.pincode || typeof address.billing.pincode !== "string" || !address.billing.pincode.trim()) return res.status(400).send({ status: false, msg: "in billing pincode must be present present and should be string" })
+                        let pinn = /^[0-9]{6}$/.test(address.billing.pincode.trim())
+                        if (!pinn) return res.status(400).send({ status: false, msg: " billing pincode Only have Number and 6 number only and should be string" })
+                        address.billing.pincode = address.billing.pincode.trim()
                     }
                     else {
                         return res.status(400).send({ status: false, msg: "billing should be in object form" })
                     }
+
                 }
 
             }
@@ -293,7 +290,7 @@ const updateuser = async function (req, res) {
 
             const updateuser = await userModel.findOneAndUpdate({ _id: userId?.trim() }, {
 
-                $set: {  password: passs }
+                $set: { password: passs }
 
             }, { new: true })
 
@@ -331,7 +328,7 @@ const updateuser = async function (req, res) {
 
         const updateuser = await userModel.findOneAndUpdate({ _id: userId?.trim() }, {
 
-            $set: { fname: fname, lname: lname, address: address, email: email, phone: phone }
+            $set: { fname: fname, lname: lname, address: address, email: email, phone: phone, upadatedData }
 
         }, { new: true })//.select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
 
@@ -348,5 +345,237 @@ const updateuser = async function (req, res) {
 
 }
 
+
+
+const updateProduct = async function (req, res) {
+
+    try {
+        if (req.params.productId == undefined)
+            return res.status(400).send({ status: false, message: "bookId is required." });
+
+        let productId = req.params.productId;
+
+
+
+
+        let data = req.body
+
+        let files = req.files
+
+
+        const upadatedData = {}
+
+        let { title, description, price, currencyId, currencyFormat, isFreeShipping, productImage, style, availableSizes, installments, isDeleted } = data // destructuring
+
+        // if (!data || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
+
+        //if (!(address || fname || lname || phone || email || password || profileImage)) {
+        // return res.status(404).send({ status: false, msg: "Plz enter valid keys for updation " })
+        // }
+
+        // bookid Validation and reviwId validation
+        let idCheck = mongoose.isValidObjectId(productId)
+
+        if (!idCheck) return res.status(400).send({ status: false, msg: "user is not a type of objectId" })
+
+        // user present or not
+        let status = await productModel.findOne({ _id: productId },)
+        if (!status) return res.status(404).send({ msg: "this Product is not present" })
+
+        let titlee = await productModel.findOne({ title: title },)
+
+        console.log(titlee)
+
+        if(titlee) return res.status(404).send({ msg: "this title is already present" })
+
+
+
+        if (status.isDeleted === true) return res.status(404).send({ status: false, msg: "this product is already deleted" })
+
+        
+        if (title) {
+        
+        if (typeof title !== "string" || title.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid title" });
+        title = title.trim()
+
+        }
+        if (description) {
+
+
+            if (typeof description !== "string" || description.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid Description" });
+        description = description.trim()
+        }
+
+        if (price) {
+
+            if (!(!isNaN(Number(price)))) return res.status(400).send({ status: false, msg: "please enter valid Price and Should be in Number" });
+
+
+            if (price < 0) {
+                return res.status(400).send({ status: false, msg: "Price Shoud be In Valid  Number only" })
+            }
+        }
+
+        if (currencyId) {
+            if (typeof description !== "string" || description.trim().length === 0) return res.status(400).send({ status: false, msg: "currencyId Should be in String" });
+
+        if (currencyId.toUpperCase() != "INR") return res.status(400).send({ status: false, msg: "currencyId Only INR accepted " });
+
+        currencyId = currencyId.toUpperCase()
+        }
+
+        if (currencyFormat) {
+
+            if (currencyFormat != "₹") {
+                return res.status(400).send({ status: false, msg: "Only Indian Currency ₹ accepted" })
+            }
+
+
+
+            // return res.status(200).send({ status: true, msg: "updated User", data: updateuser });
+        }
+
+        if (isFreeShipping) {
+
+            let Shipping = JSON.parse(isFreeShipping)
+
+            if (typeof Shipping !== 'boolean') {
+                return res.status(400).send({ status: false, msg: "isFreeShipping should be in Boolen valus" })
+            }
+
+            const update = await productModel.findOneAndUpdate({ _id: productId?.trim() }, {
+
+                $set: { isFreeShipping: Shipping }
+
+            }, { new: true })
+            data.isFreeShipping = Shipping
+
+
+            // return res.status(200).send({ status: true, msg: "updated User", data: updateuser });
+        }
+
+        if (style) {
+
+           
+            if (typeof style !== "string" || style.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid style" });
+            data.style = data.style.trim()
+
+
+            // return res.status(200).send({ status: true, msg: "updated User", data: updateuser });
+        }
+
+        if (installments) {
+
+           
+            if (!(!isNaN(Number(installments)))) return res.status(400).send({ status: false, msg: "please enter valid installments and Should be in Number" });
+
+            if (installments < 0) {
+                return res.status(400).send({ status: false, msg: "installments Shoud be In Valid  Number only" })
+            }
+            data.installments = data.installments
+
+            // return res.status(200).send({ status: true, msg: "updated User", data: updateuser });
+        }
+
+        if (isDeleted) {
+
+            let Del = JSON.parse(isDeleted)
+            console.log(typeof Del)
+
+            if (typeof Del !== "boolean") {
+                return res.status(400).send({ status: false, msg: "isDeleted is boolean so,it can be either true or false" })
+            }
+            if (Del === true) { data.deletedAt = Date.now() }
+            const update = await productModel.findOneAndUpdate({ _id: productId?.trim() }, {
+
+                $set: { isDeleted: Del }
+
+            }, { new: true })
+            data.isDeleted = Del
+
+        }
+
+        if (availableSizes) {
+
+            let siz = availableSizes.split(",")
+
+            // console.log(siz)
+            if (!Array.isArray(siz)) return res.status(400).send({ status: false, msg: "availableSizes should be array of strings" })
+
+            if (siz.some(sub => typeof sub === "string" && sub.trim().length === 0)) {
+               // return res.status(400).send({ status: false, message: " availableSizes should not be empty or with white spaces" })
+            }
+
+            let Size = ['S', 'XS', 'M', 'X', 'L', 'XXL', 'XL']
+            const subtrim = siz.map(element => {
+                return element.trim()
+
+            })
+            console.log(subtrim)
+            for (const element of subtrim) {
+
+                console.log(element)
+                if (Size.includes(element) === false) return res.status(400).send({ status: false, msg: 'availableSizes should be  ["S", "XS", "M", "X", "L", "XXL", "XL"]' })
+
+            }
+
+            const update = await productModel.findOneAndUpdate({ _id: productId?.trim() }, {
+
+                $set: { availableSizes: subtrim }
+
+            }, { new: true })
+          //  data.availableSizes = subtrim
+
+        }
+        //let files = req.files
+        if (files) {
+
+
+
+
+
+            // let files = req.files
+            // console.log(files)
+            if (files && files.length > 0) {
+                //upload to s3 and get the uploaded link
+                // res.send the link back to frontend/postman
+                let uploadedFileURL = await uploadFile(files[0])
+                data.productImage = uploadedFileURL
+                let Image = data.productImage
+                // return res.status(201).send({ status: true, data: user })
+
+                const update = await productModel.findOneAndUpdate({ _id: productId?.trim() }, {
+
+                    $set: { productImage: Image }
+
+                }, { new: true })
+            }
+
+        }
+
+        //console.log(files)
+
+        const updateuser = await productModel.findOneAndUpdate({ _id: productId?.trim() }, {
+
+            $set: { title: title, description: description, price: price, currencyId : currencyId, currencyFormat: currencyFormat,  style:style, installments:installments }
+
+        }, { new: true })//.select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
+
+        const product = await productModel.findById(productId)
+
+
+
+        return res.status(200).send({ status: true, msg: "updated User", data: product });
+    } catch (err) {
+        // console.log(err.message)
+        return res.status(500).send({ status: "error", error: err.message })
+    }
+
+
+}
+
+
 //module.exports.updatebooks = updatebooks
 module.exports.updateuser = updateuser
+
+module.exports.updateProduct = updateProduct
