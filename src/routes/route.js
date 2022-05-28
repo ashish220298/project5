@@ -5,11 +5,13 @@ const router = express.Router();
 const loginController = require("../controller/loginController")
 //const middleWare = require("../middleWare/auth")
 const put = require("../controller/putController")
-//const dController = require("../controller/DeleteControlle")
+const dController = require("../controller/DeleteControlle")
 const user = require("../controller/userController")
 //const post = require("../controller/bookController")
 const get = require("../controller/GetController")
 const postt = require("../controller/productController")
+
+const posttt = require("../controller/cartController")
 
 
 
@@ -23,6 +25,8 @@ router.post("/products", postt.createProduct)
 
 router.get("/products", get.getproduct)
 
+router.get("/products/:productId", get.getProductById)
+
 router.get("/user/:userId/profile", get.getUserById)
 
 //router.put("/books/:bookId", middleWare.validateToken, put.updatebooks)
@@ -32,9 +36,16 @@ router.put("/user/:userId/profile", put.updateuser)
 router.put("/products/:productId", put.updateProduct)
 
 
-//router.delete("/books/:bookId", middleWare.validateToken, dController.deletById)
+router.delete("/products/:productId",  dController.deletProductById)
 
 //router.delete("/books/:bookId/review/:reviewId", dController.reviewdelet)
+
+
+router.post("/users/:userId/cart", posttt.createCart)
+
+router.put("/users/:userId/cart", posttt.updateCart)
+
+
 
 
 

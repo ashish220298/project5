@@ -171,10 +171,7 @@ const updateuser = async function (req, res) {
 
         if (status.isDeleted === true) return res.status(404).send({ status: false, msg: "this user is already deleted" })
 
-        if (address.shipping.street) {
-            if (address.billing.street.trim().toLowerCase().length === 0) return res.status(400).send({ status: false, msg: "in address street must be present and should be string and enter a valied street" })
-            address.shipping.street = address.shipping.street.trim().toLowerCase()
-        }
+       
         if (address) {
 
             // if (address.shipping) return res.status(400).send({ status: false, msg: " shipping should be present" })
@@ -199,7 +196,7 @@ const updateuser = async function (req, res) {
                         return res.status(400).send({ status: false, msg: "shipping should be in object form" })
 
                     }
-                } else { return res.status(400).send({ status: false, msg: "shipping address Should be present" }) }
+                }  else { return res.status(400).send({ status: false, msg: "shipping address Should be present" }) }
 
                 // billing validation 
                 if (address.billing) {
