@@ -303,8 +303,64 @@ const getCart = async function (req, res) {
     }
 }
 
+
+
+
+const deleteCart = async function (req, res) {
+    try {
+       // const data = req.body
+        const userId = req.params.userId
+      //  let { removeProduct, productId, cartId } = data
+
+
+        // if (!isValid(userId)) {
+        // res.status(400).send({ status: false, message: 'please provide userId' })
+        // return
+        //  }
+
+      //  const userByuserId = await userModel.findById(userId);
+
+       // if (!userByuserId) {
+           // return res.status(404).send({ status: false, message: 'user not found.' });
+      //  }
+
+        //  if(userIdbyParams!==data.userId){
+        //    res.status(400).send({status:false, message:"Plz Provide Similar UserId's in params and body"})
+        //     return  
+        //  }
+        // if (!isValidObjId.test(productId)) {
+        // return res.status(400).send({ status: false, message: "productId  is not valid" });
+        // }
+
+
+
+
+        
+                const DelCart = await cartModel.findOneAndUpdate(
+                    { userId:userId },
+                    {
+                       $set: { totalPrice: 0,items: [],totalItems:0 }
+                    },
+                    { new: true }
+                );
+
+                return res.status(200).send({ status: true, message: "Item and Products delete in cart", data: DelCart});
+
+            }
+
+        
+    
+
+    catch (err) {
+        res.status(500).send({ status: "error", error: err.message })
+    }
+}
+
+
 module.exports.createCart = createCart
 
 module.exports.updateCart = updateCart
 
 module.exports.getCart = getCart
+
+module.exports.deleteCart = deleteCart

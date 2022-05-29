@@ -47,6 +47,8 @@ router.put("/users/:userId/cart", posttt.updateCart)
 
 router.get("/users/:userId/cart", posttt.getCart)
 
+router.delete("/users/:userId/cart", posttt.deleteCart)
+
 
 
 
