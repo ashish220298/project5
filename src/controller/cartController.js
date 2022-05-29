@@ -217,29 +217,21 @@ const updateCart = async function (req, res) {
                 (product) => (product["productId"] = product["productId"].toString()));
 
 
-
-
+            if (!/^[0,1]{1}$/.test(removeProduct)) {
+                return res.status(400)
+                    .send({ status: false, msg: "removeProduct should be Present and removeproduct Should be 0 for perticular product Decrease and 1 for perticular product remove" });
+            }
+            console.log(removeProduct)
             if (removeProduct == 0) {
 
                 if (isProductPresentInCart.includes(productId)) {
-
-
-
-
-
                     const updateExistingProductQuantity = await cartModel.findOneAndUpdate({ _id: cartId, "items.productId": productId },
                         {
                             $inc: { totalPrice: -isProductPresent.price, "items.$.quantity": -1, },
                         }, { new: true });
 
-                    return res.status(200).send({
-                        status: true, message: "Product quantity updated to cart", data: updateExistingProductQuantity,
-                    });
-
-
-
+                    return res.status(200).send({ status: true, message: "Product quantity updated to cart", data: updateExistingProductQuantity });
                 }
-
             }
 
             //  console.log(isCartIdPresent.totalPrice)
@@ -247,11 +239,7 @@ const updateCart = async function (req, res) {
 
                 let Rproduct = removeProduct
                 let removeProductt = Rproduct * (-1)
-                // let x = isCartIdPresent.items
-                //  for(i=0;i<=x.length;i++){
-                //  x[indexOf isProductPresent].quantity
-                // console.log(x[i].quantity)
-                //   }
+
                 let findQuantity = isCartIdPresent.items.find(x => x.productId.toString() === productId)
 
                 // console.log(findQuantity)
@@ -308,9 +296,9 @@ const getCart = async function (req, res) {
 
 const deleteCart = async function (req, res) {
     try {
-       // const data = req.body
+        // const data = req.body
         const userId = req.params.userId
-      //  let { removeProduct, productId, cartId } = data
+        //  let { removeProduct, productId, cartId } = data
 
 
         // if (!isValid(userId)) {
@@ -318,11 +306,11 @@ const deleteCart = async function (req, res) {
         // return
         //  }
 
-      //  const userByuserId = await userModel.findById(userId);
+        //  const userByuserId = await userModel.findById(userId);
 
-       // if (!userByuserId) {
-           // return res.status(404).send({ status: false, message: 'user not found.' });
-      //  }
+        // if (!userByuserId) {
+        // return res.status(404).send({ status: false, message: 'user not found.' });
+        //  }
 
         //  if(userIdbyParams!==data.userId){
         //    res.status(400).send({status:false, message:"Plz Provide Similar UserId's in params and body"})
@@ -335,21 +323,21 @@ const deleteCart = async function (req, res) {
 
 
 
-        
-                const DelCart = await cartModel.findOneAndUpdate(
-                    { userId:userId },
-                    {
-                       $set: { totalPrice: 0,items: [],totalItems:0 }
-                    },
-                    { new: true }
-                );
 
-                return res.status(200).send({ status: true, message: "Item and Products delete in cart", data: DelCart});
+        const DelCart = await cartModel.findOneAndUpdate(
+            { userId: userId },
+            {
+                $set: { totalPrice: 0, items: [], totalItems: 0 }
+            },
+            { new: true }
+        );
 
-            }
+        return res.status(200).send({ status: true, message: "Item and Products delete in cart", data: DelCart });
 
-         
-    
+    }
+
+
+
 
     catch (err) {
         res.status(500).send({ status: "error", error: err.message })
