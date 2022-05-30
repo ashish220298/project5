@@ -6,9 +6,9 @@ const orderSchema = new mongoose.Schema({
 
     userId: {
         type:ObjectId, 
-        ref:'userModel',
-        required:true , 
-        unique:true
+        ref:'users',
+        required:true 
+        
     },
 
     items: [{
