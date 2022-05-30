@@ -13,6 +13,8 @@ const postt = require("../controller/productController")
 
 const posttt = require("../controller/cartController")
 
+const order = require("../controller/orderController")
+
 
 
 router.post("/register", user.createuser)
@@ -48,6 +50,8 @@ router.put("/users/:userId/cart", posttt.updateCart)
 router.get("/users/:userId/cart", posttt.getCart)
 
 router.delete("/users/:userId/cart", posttt.deleteCart)
+
+router.post("/users/:userId/orders", order.createOrder)
 
 
 

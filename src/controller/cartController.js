@@ -216,7 +216,8 @@ const updateCart = async function (req, res) {
             const isProductPresentInCart = isCartIdPresent.items.map(
                 (product) => (product["productId"] = product["productId"].toString()));
 
-
+               
+    
             if (!/^[0,1]{1}$/.test(removeProduct)) {
                 return res.status(400)
                     .send({ status: false, msg: "removeProduct should be Present and removeproduct Should be 0 for perticular product Decrease and 1 for perticular product remove" });
