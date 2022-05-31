@@ -53,6 +53,8 @@ router.delete("/users/:userId/cart", posttt.deleteCart)
 
 router.post("/users/:userId/orders", order.createOrder)
 
+router.put("/users/:userId/orders", order.updateStatusOrder)
+
 
 
 

@@ -24,7 +24,7 @@ const createOrder = async function (req, res) {
             return res.status(404).send({ status: false, message: 'user not found.' });
         }
 
-    
+
 
         if (data.hasOwnProperty("cartId")) {
 
@@ -58,16 +58,16 @@ const createOrder = async function (req, res) {
             }
             let totalQuantity = isCartIdPresent.items.map((x) => x.quantity)
 
-             console.log(totalQuantity)
+            console.log(totalQuantity)
 
-           
-             const initialValue = 0;
-             const Quantity = totalQuantity.reduce(
-               (previousValue, currentValue) => previousValue + currentValue,
-               initialValue
-             );
-             
-             console.log(Quantity);
+
+            const initialValue = 0;
+            const Quantity = totalQuantity.reduce(
+                (previousValue, currentValue) => previousValue + currentValue,
+                initialValue
+            );
+
+            console.log(Quantity);
 
             const OrderData = {
                 userId: userId,
@@ -82,20 +82,20 @@ const createOrder = async function (req, res) {
             const Order = await orderModel.create(OrderData);
 
             const UpdateCart = await cartModel.findOneAndUpdate(
-                { userId: userId,_id: cartId},
+                { userId: userId, _id: cartId },
                 {
                     $set: { totalPrice: 0, items: [], totalItems: 0 }
                 },
                 { new: true }
             );
-                 
+
             let fname = userByuserId.fname
             let lname = userByuserId.lname
 
 
             return res.status(200).send({ status: true, message: `Order placed Congratulations, Thank You  ${fname} ${lname}`, data: UpdateCart });
-    
-        
+
+
         }
     }
 
@@ -104,6 +104,123 @@ const createOrder = async function (req, res) {
     }
 }
 
+
+
+
+const updateStatusOrder = async function (req, res) {
+    try {
+        const data = req.body
+        const userId = req.params.userId
+        let { orderId, status } = data
+
+
+        // if (!isValid(userId)) {
+        // res.status(400).send({ status: false, message: 'please provide userId' })
+        // return
+        //  }
+
+        const userByuserId = await userModel.findById(userId);
+
+        if (!userByuserId) {
+            return res.status(404).send({ status: false, message: 'user not found.' });
+        }
+
+
+
+        if (data.hasOwnProperty("orderId")) {
+
+            //  if (!isValid(cartId)) {
+            //  return res.status(400).send({ status: false, message: "cartId could not be blank" });
+            // }
+
+            //if (!isValidObjId.test(cartId)) {
+            //    return res.status(400).send({ status: false, message: "cartId  is not valid" });
+            //  }
+            const isOrderPresent = await orderModel.findOne({ _id: orderId, userId: userId, isDeleted: false });
+            console.log(isOrderPresent)
+            //  if (!isOrderPresent) {
+            // return res.status(404).send({ status: false, message: `Order not found by this user ${userId}` });
+            //  }
+
+            // const cartIdForUser = await cartModel.findOne({ userId: userId });
+            console.log(isOrderPresent.cancellable)
+            if (isOrderPresent.cancellable == true) {
+
+                console.log(isOrderPresent.cancellable)
+                if (status == "cancled") {
+
+                    const Updateorder = await orderModel.findOneAndUpdate(
+                        { userId: userId, _id: orderId },
+                        {
+                            $set: { status: status }
+                        },
+                        { new: true }
+                    );
+
+
+                    return res.status(403).send({
+                        status: false,
+                        message: `User is not allowed to update this cart`, Data: Updateorder
+                    });
+
+                } else {
+
+                    const Updateorder = await orderModel.findOneAndUpdate(
+                        { userId: userId, _id: orderId },
+                        {
+                            $set: { status: status }
+                        },
+                        { new: true }
+                    );
+
+
+                    return res.status(403).send({
+                        status: false,
+                        message: `User is not allowed to update this cart`, data: Updateorder,
+                    });
+                }
+
+
+            }
+            if (isOrderPresent.cancellable == false && status !== "cancled") {
+
+                const Updateorder = await orderModel.findOneAndUpdate(
+                    { userId: userId, _id: orderId },
+                    {
+                        $set: { status: status }
+                    },
+                    { new: true }
+                );
+
+
+                return res.status(403).send({
+                    status: false,
+                    message: `User is not allowed to update this cart`, data: Updateorder,
+                });
+            } else {
+
+                return res.status(403).send({
+                    status: false,
+                    message: `Order is not canceble`
+                });
+            }
+
+
+
+        }
+    }
+
+    catch (err) {
+        res.status(500).send({ status: "error", error: err.message })
+    }
+}
+
+
+
+
+
 module.exports.createOrder = createOrder
+
+module.exports.updateStatusOrder = updateStatusOrder
 
 
