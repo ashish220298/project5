@@ -25,14 +25,11 @@ const getUserById = async function (req, res) {
             return res.status(404).send({ status: false, msg: "user not found" })
         }
 
-        // const data = await reviewModel.find({ bookId: bookId, isDeleted: false }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 }).sort({ "reviewedBy": 1 })
+        
 
         const user = await userModel.findById(userId).select({ address: 1, _id: 1, fname: 1, lname: 1, email: 1, profileImage: 1, phone: 1, password: 1, createdAt: 1, updatedAt: 1 })
 
-        // let doc = {
-        //  Book: book,
-        // reviewsData: data,
-        // }
+     
         return res.status(200).send({ status: true, message: "User Ditles", data: user })
 
     } catch (err) {
