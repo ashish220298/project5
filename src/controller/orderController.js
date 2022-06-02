@@ -28,13 +28,7 @@ const createOrder = async function (req, res) {
 
         if (data.hasOwnProperty("cartId")) {
 
-            //  if (!isValid(cartId)) {
-            //  return res.status(400).send({ status: false, message: "cartId could not be blank" });
-            // }
-
-            //if (!isValidObjId.test(cartId)) {
-            //    return res.status(400).send({ status: false, message: "cartId  is not valid" });
-            //  }
+           
             const isCartIdPresent = await cartModel.findById(cartId);
 
             if (!isCartIdPresent) {
@@ -114,10 +108,7 @@ const updateStatusOrder = async function (req, res) {
         let { orderId, status } = data
 
 
-        // if (!isValid(userId)) {
-        // res.status(400).send({ status: false, message: 'please provide userId' })
-        // return
-        //  }
+      
 
         const userByuserId = await userModel.findById(userId);
 
@@ -129,18 +120,12 @@ const updateStatusOrder = async function (req, res) {
 
         if (data.hasOwnProperty("orderId")) {
 
-            //  if (!isValid(cartId)) {
-            //  return res.status(400).send({ status: false, message: "cartId could not be blank" });
-            // }
-
-            //if (!isValidObjId.test(cartId)) {
-            //    return res.status(400).send({ status: false, message: "cartId  is not valid" });
-            //  }
+          
             const isOrderPresent = await orderModel.findOne({ _id: orderId, userId: userId, isDeleted: false });
             console.log(isOrderPresent)
-            //  if (!isOrderPresent) {
-            // return res.status(404).send({ status: false, message: `Order not found by this user ${userId}` });
-            //  }
+              if (!isOrderPresent) {
+             return res.status(404).send({ status: false, message: `Order not found by this user ${userId}` });
+              }
 
             // const cartIdForUser = await cartModel.findOne({ userId: userId });
             console.log(isOrderPresent.cancellable)

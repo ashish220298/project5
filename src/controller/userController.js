@@ -74,19 +74,7 @@ const createuser = async (req, res) => {
         if (!nnname) return res.status(400).send({ status: false, msg: "enter valid  lname" })
 
         data.lname = data.lname.trim()
-        // title validation
-        // if (!title) return res.status(400).send({ status: false, msg: "title must be present" });
-        //  if (typeof title !== "string") return res.status(400).send({ status: false, msg: "title should be string" });
-        // if (!(["Mr", "Mrs", "Miss"].includes(data.title.trim()))) return res.status(400).send({ status: false, msg: "plz write valid title" })
-        //  data.title = data.title.trim()
-
-       // if (!profileImage || profileImage === undefined) return res.status(400).send({ status: false, msg: "profileImage must be present" });
-       // if (typeof profileImage !== "string" || profileImage.trim().length === 0) return res.status(400).send({ status: false, msg: "profileImage should be string" });
-
-       // if (!(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%.\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:\+.~#?&//=]*)/.test(profileImage.trim()))) {
-          //  return res.status(400).send({ status: false, msg: "logoLink is a not valid" });
-       // }
-
+       
         // email validation
         if (!email) {
             return res.status(400).send({ status: false, msg: "email must be present" });

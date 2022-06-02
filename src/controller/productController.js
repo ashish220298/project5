@@ -1,7 +1,6 @@
 //const mongoose = require('mongoose');
 //const userModel = require("../model/userModel")
 const productModel = require("../model/productModel")
-
 //import currencySymbol from 'currency-symbol-map'
 const aws = require("aws-sdk")
 //const multer = require("multer");
@@ -54,38 +53,21 @@ const createProduct = async function (req, res) {
         if (!data || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
 
         let { title, description, price, currencyId, currencyFormat, isFreeShipping, productImage, style, availableSizes, installments, isDeleted } = data
-        // Book is same Book or not
-        // if (typeof ISBN !== "string") {
-        //  return res.status(400).send({ status: false, msg: "ISBN datatype should be string" })
-        //    }
 
         if (typeof title !== "string" || title.trim().length === 0) return res.status(400).send({ status: false, msg: "please enter valid title" });
         const check = await productModel.findOne({ title: title?.trim() })
         // console.table(check)
         if (check) return res.status(400).send({ status: false, msg: "this Product already exist" })
-        // authorId validation
 
 
-        // if (typeof userId !== "string") {
-        // return res.status(400).send({ status: false, msg: "userId datatype should be string" })
-        //  }
 
-        //  let idCheck = mongoose.isValidObjectId(userId)
-        // userId = userId?.trim()
-        //console.log(idCheck)
-        // if (!idCheck) return res.status(400).send({ status: false, msg: "userId is not a type of objectId" })
-
-        //  const id = await userModel.findById(userId)
-        // if (!id) {
-        //  return res.status(404).send({ status: false, msg: "this user is not present." })
-        // }
         //  accessing the payload authorId from request
-        //let token = req["userId"]
+        let token = req["userId"]
 
-        //  authorization
-        // if (token != userId) {
-        //  return res.status(403).send({ status: false, msg: "You are not authorized to access this data" })
-        // }
+        authorization
+        if (token != userId) {
+            return res.status(403).send({ status: false, msg: "You are not authorized to access this data" })
+        }
         //console.log(title)
 
         // title validation
@@ -132,11 +114,7 @@ const createProduct = async function (req, res) {
         if (currencyFormat != "₹") {
             return res.status(400).send({ status: false, msg: "Only Indian Currency ₹ accepted" })
         }
-        // ISBN validation
 
-        // if (!isFreeShipping || isFreeShipping === undefined) {
-        //  return res.status(400).send({ status: false, msg: "isFreeShipping is not given" })
-        // }
         if (isFreeShipping) {
             let Shipping = JSON.parse(isFreeShipping)
 
@@ -146,21 +124,6 @@ const createProduct = async function (req, res) {
             data.isFreeShipping = Shipping
         }
 
-        // let ISBNN = /^\d{3}-?\d{10}/.test(ISBN.trim())
-        //   if (!ISBNN) {
-        //return res.status(400).send({ status: false, msg: "ISBN is ony number and should be in format like XXX-XXXXXXXXXX" })
-        // }
-        //  data.ISBN = data.ISBN.trim()
-        //reviews Validation
-        // if (!reviews || reviews === undefined) {
-        // return res.status(400).send({ status: false, msg: "reviews is not given" })
-        //  }
-
-        // let reviewss = /^[0]$/.test(reviews)
-        // if (!reviewss) {
-        // return res.status(400).send({ status: false, msg: "Reviews is only 0 when u created" })
-        // }
-        // body validation
 
         if (style) {
 

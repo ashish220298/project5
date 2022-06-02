@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const userModel = require("../model/userModel")
-//const bookModel = require("../model/bookModel")
-//const reviewModel = require("../model/reviewModel")
 const productModel = require("../model/productModel")
 const bcrypt = require("bcrypt")
 const aws = require("aws-sdk")
@@ -152,12 +150,7 @@ const updateuser = async function (req, res) {
 
         let { address, fname, lname, phone, email, password, } = data // destructuring
 
-        // if (!data || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
-
-        //if (!(address || fname || lname || phone || email || password || profileImage)) {
-        // return res.status(404).send({ status: false, msg: "Plz enter valid keys for updation " })
-        // }
-
+   
         // bookid Validation and reviwId validation
         let idCheck = mongoose.isValidObjectId(userId)
 
@@ -171,10 +164,15 @@ const updateuser = async function (req, res) {
 
         if (status.isDeleted === true) return res.status(404).send({ status: false, msg: "this user is already deleted" })
 
-       
+        let token = req["userId"]
+
+        //  authorization
+        if (token != userId) {
+            return res.status(403).send({ status: false, msg: "You are not authorized to access this data" })
+        }
         if (address) {
 
-            // if (address.shipping) return res.status(400).send({ status: false, msg: " shipping should be present" })
+            
             if (Object.prototype.toString.call(address) === "[object Object]") {
 
                 if (address.shipping) {
@@ -364,11 +362,9 @@ const updateProduct = async function (req, res) {
 
         let { title, description, price, currencyId, currencyFormat, isFreeShipping, productImage, style, availableSizes, installments, isDeleted } = data // destructuring
 
-        // if (!data || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
+         if (!data || Object.keys(data).length === 0) return res.status(400).send({ status: false, msg: "plz enter some data" })
 
-        //if (!(address || fname || lname || phone || email || password || profileImage)) {
-        // return res.status(404).send({ status: false, msg: "Plz enter valid keys for updation " })
-        // }
+      
 
         // bookid Validation and reviwId validation
         let idCheck = mongoose.isValidObjectId(productId)
@@ -572,7 +568,7 @@ const updateProduct = async function (req, res) {
 }
 
 
-//module.exports.updatebooks = updatebooks
+
 module.exports.updateuser = updateuser
 
 module.exports.updateProduct = updateProduct

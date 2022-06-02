@@ -12,11 +12,6 @@ const createCart = async function (req, res) {
         let { userId, productId, cartId } = data
 
 
-        // if (!isValid(userId)) {
-        // res.status(400).send({ status: false, message: 'please provide userId' })
-        // return
-        //  }
-
         const userByuserId = await userModel.findById(userIdbyParams);
 
         if (!userByuserId) {
@@ -27,10 +22,7 @@ const createCart = async function (req, res) {
             res.status(400).send({ status: false, message: "Plz Provide Similar UserId's in params and body" })
             return
         }
-        // if (!isValidObjId.test(productId)) {
-        // return res.status(400).send({ status: false, message: "productId  is not valid" });
-        // }
-
+       
 
 
 
@@ -42,13 +34,7 @@ const createCart = async function (req, res) {
 
         if (data.hasOwnProperty("cartId")) {
 
-            //  if (!isValid(cartId)) {
-            //  return res.status(400).send({ status: false, message: "cartId could not be blank" });
-            // }
-
-            //if (!isValidObjId.test(cartId)) {
-            //    return res.status(400).send({ status: false, message: "cartId  is not valid" });
-            //  }
+           
             const isCartIdPresent = await cartModel.findById(cartId);
 
             if (!isCartIdPresent) {
@@ -137,25 +123,22 @@ const updateCart = async function (req, res) {
         let { removeProduct, productId, cartId } = data
 
 
-        // if (!isValid(userId)) {
-        // res.status(400).send({ status: false, message: 'please provide userId' })
-        // return
-        //  }
+        if (!mongoose.isValidObjectId(userId)) {
+            return res.status(400).send({ status: false, msg: "userId is not a type of objectId" })
+        }
 
+        if (!mongoose.isValidObjectId(cartId)) {
+            return res.status(400).send({ status: false, msg: "cartId is not a type of objectId" })
+        }
         const userByuserId = await userModel.findById(userId);
 
         if (!userByuserId) {
             return res.status(404).send({ status: false, message: 'user not found.' });
         }
 
-        //  if(userIdbyParams!==data.userId){
-        //    res.status(400).send({status:false, message:"Plz Provide Similar UserId's in params and body"})
-        //     return  
-        //  }
-        // if (!isValidObjId.test(productId)) {
-        // return res.status(400).send({ status: false, message: "productId  is not valid" });
-        // }
-
+        if (!productId) return res.status(400).send({ status: false, msg: "ProductId must be Present" })
+        if (!removeProduct) return res.status(400).send({ status: false, msg: "removeProduct must be Present" })
+        if (!cartId) return res.status(400).send({ status: false, msg: "cartId must be Present" })
 
 
 
@@ -167,14 +150,7 @@ const updateCart = async function (req, res) {
 
         if (data.hasOwnProperty("cartId")) {
 
-            //  if (!isValid(cartId)) {
-            //  return res.status(400).send({ status: false, message: "cartId could not be blank" });
-            // }
-
-            //if (!isValidObjId.test(cartId)) {
-            //    return res.status(400).send({ status: false, message: "cartId  is not valid" });
-            //  }
-
+           
 
             const productForUser = await cartModel.findOne({ "items.productId": productId, userId: userId });
             console.log(productForUser)
@@ -216,8 +192,8 @@ const updateCart = async function (req, res) {
             const isProductPresentInCart = isCartIdPresent.items.map(
                 (product) => (product["productId"] = product["productId"].toString()));
 
-               
-    
+
+
             if (!/^[0,1]{1}$/.test(removeProduct)) {
                 return res.status(400)
                     .send({ status: false, msg: "removeProduct should be Present and removeproduct Should be 0 for perticular product Decrease and 1 for perticular product remove" });
@@ -278,8 +254,18 @@ const getCart = async function (req, res) {
 
         const userId = req.params.userId
 
+        const userByuserId = await userModel.findById(userId);
+
+        if (!userByuserId) {
+            return res.status(404).send({ status: false, message: 'user not found.' });
+        }
 
         const isCartIdPresent = await cartModel.findOne({ userId: userId });
+
+        if (!isCartIdPresent) {
+            return res.status(404).send({ status: false, message: 'cret not found.' });
+        }
+
 
         return res.status(400).send({ status: false, message: 'User,s cart', Data: isCartIdPresent })
 
@@ -297,33 +283,20 @@ const getCart = async function (req, res) {
 
 const deleteCart = async function (req, res) {
     try {
-        // const data = req.body
+
         const userId = req.params.userId
-        //  let { removeProduct, productId, cartId } = data
 
+        const userByuserId = await userModel.findById(userId);
 
-        // if (!isValid(userId)) {
-        // res.status(400).send({ status: false, message: 'please provide userId' })
-        // return
-        //  }
+        if (!userByuserId) {
+            return res.status(404).send({ status: false, message: 'user not found.' });
+        }
 
-        //  const userByuserId = await userModel.findById(userId);
+        const isCartIdPresent = await cartModel.findOne({ userId: userId });
 
-        // if (!userByuserId) {
-        // return res.status(404).send({ status: false, message: 'user not found.' });
-        //  }
-
-        //  if(userIdbyParams!==data.userId){
-        //    res.status(400).send({status:false, message:"Plz Provide Similar UserId's in params and body"})
-        //     return  
-        //  }
-        // if (!isValidObjId.test(productId)) {
-        // return res.status(400).send({ status: false, message: "productId  is not valid" });
-        // }
-
-
-
-
+        if (!isCartIdPresent) {
+            return res.status(404).send({ status: false, message: 'cret not found.' });
+        }
 
         const DelCart = await cartModel.findOneAndUpdate(
             { userId: userId },

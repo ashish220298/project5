@@ -3,57 +3,52 @@ const router = express.Router();
 
 
 const loginController = require("../controller/loginController")
-//const middleWare = require("../middleWare/auth")
+const middleWare = require("../middleWare/auth")
 const put = require("../controller/putController")
 const dController = require("../controller/DeleteControlle")
 const user = require("../controller/userController")
-//const post = require("../controller/bookController")
 const get = require("../controller/GetController")
 const postt = require("../controller/productController")
-
 const posttt = require("../controller/cartController")
-
 const order = require("../controller/orderController")
 
 
+// User APIs
+router.post("/register", user.createuser)// 1
 
-router.post("/register", user.createuser)
+router.post("/login", loginController.loginUser)// 2
 
-router.post("/login", loginController.loginUser)
+router.put("/user/:userId/profile", middleWare.validateToken, put.updateuser)// 3
 
-//router.post("/books", middleWare.validateToken, post.createBooks)
-
-router.post("/products", postt.createProduct)
-
-router.get("/products", get.getproduct)
-
-router.get("/products/:productId", get.getProductById)
-
-router.get("/user/:userId/profile", get.getUserById)
-
-//router.put("/books/:bookId", middleWare.validateToken, put.updatebooks)
-
-router.put("/user/:userId/profile", put.updateuser)
-
-router.put("/products/:productId", put.updateProduct)
+router.get("/user/:userId/profile", get.getUserById)// 4
 
 
-router.delete("/products/:productId",  dController.deletProductById)
+// Product APIs
+router.post("/products", postt.createProduct)// 5
 
-//router.delete("/books/:bookId/review/:reviewId", dController.reviewdelet)
+router.get("/products", get.getproduct)// 6
+
+router.get("/products/:productId", get.getProductById)// 7
+
+router.put("/products/:productId", put.updateProduct)// 8
+
+router.delete("/products/:productId", dController.deletProductById)// 9
 
 
-router.post("/users/:userId/cart", posttt.createCart)
+// Cart APIs
+router.post("/users/:userId/cart", posttt.createCart)// 10
 
-router.put("/users/:userId/cart", posttt.updateCart)
+router.put("/users/:userId/cart", posttt.updateCart)// 11
 
-router.get("/users/:userId/cart", posttt.getCart)
+router.get("/users/:userId/cart", posttt.getCart)//  12
 
-router.delete("/users/:userId/cart", posttt.deleteCart)
+router.delete("/users/:userId/cart", posttt.deleteCart)// 13
 
-router.post("/users/:userId/orders", order.createOrder)
 
-router.put("/users/:userId/orders", order.updateStatusOrder)
+// Order APIs
+router.post("/users/:userId/orders", order.createOrder)// 14
+
+router.put("/users/:userId/orders", order.updateStatusOrder)// 15
 
 
 
